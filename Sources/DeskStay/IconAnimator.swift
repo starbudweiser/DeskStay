@@ -9,7 +9,7 @@ import DeskStayCore
 /// quand le fil principal attend le Finder). Les icônes qui ne bougent pas ne sont pas touchées.
 @MainActor
 enum IconAnimator {
-    static var duration: CFTimeInterval = 0.6
+    static var duration: CFTimeInterval = 0.35
     private static let cellWidth: CGFloat = 112
     private static let labelHeight: CGFloat = 36
     private static let labelGap: CGFloat = 4
@@ -33,7 +33,7 @@ enum IconAnimator {
         guard stage.isReady else { return try bridge.restoreDesktop(icons, displays: displays) }
 
         stage.show()
-        pump(0.14)
+        pump(0.08)
         stage.startAnimation()
         let started = CACurrentMediaTime()
         defer { stage.close() }
@@ -41,7 +41,7 @@ enum IconAnimator {
         let remaining = duration + 0.05 - (CACurrentMediaTime() - started)
         if remaining > 0 { pump(remaining) }
         stage.fadeOut()
-        pump(0.18)
+        pump(0.12)
         return moved
     }
 
@@ -99,8 +99,8 @@ enum IconAnimator {
                     surfaces[display.id] = Self.makeSurface(screen: screen, display: display)
                 }
                 guard surfaces[move.fromDisplay.id] != nil, surfaces[move.toDisplay.id] != nil else { ok = false; continue }
-                masks[move.fromDisplay.id, default: []].append(Self.cell(at: move.from, in: move.fromDisplay, iconSize: iconSize))
-                masks[move.toDisplay.id, default: []].append(Self.cell(at: move.to, in: move.toDisplay, iconSize: iconSize))
+                masks[move.fromDisplay.id, default: []] += Self.cutouts(move.name, at: move.from, in: move.fromDisplay, iconSize: iconSize, textSize: textSize)
+                masks[move.toDisplay.id, default: []] += Self.cutouts(move.name, at: move.to, in: move.toDisplay, iconSize: iconSize, textSize: textSize)
                 pending.append((move, move.fromDisplay.id != move.toDisplay.id))
             }
             isReady = ok && !surfaces.isEmpty
@@ -135,7 +135,7 @@ enum IconAnimator {
                 let fade = CABasicAnimation(keyPath: "opacity")
                 fade.fromValue = 0
                 fade.toValue = 1
-                fade.duration = 0.12
+                fade.duration = 0.07
                 surface.root.opacity = 1
                 surface.root.add(fade, forKey: "fadeIn")
             }
@@ -171,7 +171,7 @@ enum IconAnimator {
                 let fade = CABasicAnimation(keyPath: "opacity")
                 fade.fromValue = 1
                 fade.toValue = 0
-                fade.duration = 0.15
+                fade.duration = 0.1
                 surface.root.opacity = 0
                 surface.root.add(fade, forKey: "fadeOut")
             }
@@ -207,13 +207,28 @@ enum IconAnimator {
             return Surface(window: window, root: view.layer!, display: display, scale: screen.backingScaleFactor)
         }
 
-        /// Rectangle (repère de la fenêtre, origine en bas à gauche) couvrant une icône et son nom.
-        private static func cell(at global: CGPoint, in display: DisplaySnapshot, iconSize: CGFloat) -> CGRect {
+        /// Deux rectangles (repère de la fenêtre, origine en bas à gauche) : l'image avec la marge de son ombre, et le nom mesuré.
+        /// Au plus juste, pour ne pas rogner le nom d'une icône voisine qui reste en place.
+        private static func cutouts(_ name: String, at global: CGPoint, in display: DisplaySnapshot,
+                                    iconSize: CGFloat, textSize: CGFloat) -> [CGRect] {
             let x = global.x - display.frame.minX
             let y = display.frame.height - (global.y - display.frame.minY)
-            let height = iconSize + IconAnimator.labelGap + IconAnimator.labelHeight
-            return CGRect(x: x - IconAnimator.cellWidth / 2, y: y - iconSize / 2 - IconAnimator.labelGap - IconAnimator.labelHeight,
-                          width: IconAnimator.cellWidth, height: height)
+            let image = CGRect(x: x - iconSize / 2, y: y - iconSize / 2, width: iconSize, height: iconSize).insetBy(dx: -8, dy: -8)
+            let text = displayName(of: name) as NSString
+            let measured = text.boundingRect(with: NSSize(width: IconAnimator.cellWidth, height: IconAnimator.labelHeight),
+                                             options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
+                                             attributes: [.font: labelFont(textSize)])
+            let width = min(IconAnimator.cellWidth, ceil(measured.width) + 4)
+            let height = min(IconAnimator.labelHeight, ceil(measured.height) + 2)
+            let top = y - iconSize / 2 - IconAnimator.labelGap
+            let label = CGRect(x: x - width / 2, y: top - height, width: width, height: height).insetBy(dx: -3, dy: -2)
+            return [image, label]
+        }
+
+        private static func labelFont(_ size: CGFloat) -> NSFont { NSFont.systemFont(ofSize: size, weight: .semibold) }
+
+        private static func displayName(of name: String) -> String {
+            FileManager.default.displayName(atPath: path(forDesktopItem: name))
         }
 
         private static func point(_ global: CGPoint, in surface: Surface) -> CGPoint {
@@ -268,13 +283,17 @@ enum IconAnimator {
             let icon = NSWorkspace.shared.icon(forFile: path)
             icon.size = NSSize(width: iconSize, height: iconSize)
             image.contents = icon.cgImage(forProposedRect: nil, context: nil, hints: nil)
+            image.shadowColor = NSColor.black.cgColor
+            image.shadowOpacity = 0.4
+            image.shadowRadius = 3
+            image.shadowOffset = CGSize(width: 0, height: -2)
             group.addSublayer(image)
 
             let label = CATextLayer()
             label.frame = CGRect(x: 0, y: 0, width: width, height: IconAnimator.labelHeight)
             label.contentsScale = scale
-            label.string = FileManager.default.displayName(atPath: path)
-            label.font = NSFont.systemFont(ofSize: textSize, weight: .medium)
+            label.string = Self.displayName(of: name)
+            label.font = Self.labelFont(textSize)
             label.fontSize = textSize
             label.foregroundColor = NSColor.white.cgColor
             label.alignmentMode = .center
