@@ -37,9 +37,9 @@ Références :
 ## Points ouverts
 - **Signature / notarisation bloquées** : le mot de passe du trousseau « session » ne correspond pas au mot de passe de session (vérifié avec `dscl . -authonly`), donc `codesign` ne peut pas utiliser la clé Developer ID `B675FD78…` (trousseau session). Une 2e identité Developer ID (`CB7AAA54…`) est dans `skyrim-signing.keychain-db`. Ne jamais réinitialiser le trousseau sans accord explicite.
 - Pour notariser : signature Developer ID + `--options runtime` + entitlement `com.apple.security.automation.apple-events`, puis `xcrun notarytool submit` et `xcrun stapler staple`.
-- Essais réels du 31/10/2026, via `--selftest` lancé depuis le shell : mémoriser, restaurer (icône, fenêtre Finder rouverte, position d'icône dans la fenêtre, fenêtre d'app, écran secondaire), masquage, restauration auto (observateurs réels, notifications postées dans le processus). OK.
+- Essais réels du 31/10/2026 (via `--selftest memorize|restore all|icons|windows|app:<bundle>`) : mémoriser et restaurer séparément icônes (type DIM) et fenêtres (type Stay), une seule app, exclusion « ne pas déplacer », fenêtres Finder fermées jamais rouvertes, masquage, observateurs d'événements. OK.
 - Pas encore testé : demandes d'autorisation de l'app seule (le shell transmet les siennes), vrais événements écran / réveil / déverrouillage, clics sur le menu, ouverture à la connexion, masquage visible sur l'écran portrait (il était en plein écran).
-- À trancher : la restauration auto (active par défaut au réveil et au déverrouillage) rouvre les fenêtres Finder fermées et replace toutes les fenêtres ; elle cohabite mal avec Stay, encore lancé sur ce Mac.
+- Décidé le 31/10/2026 : aucune restauration automatique par défaut (écrans, réveil, ouverture : options désactivées à la Stay) ; fenêtres Finder fermées jamais rouvertes ; choix app par app (`excludedApps`) ; icônes et fenêtres mémorisées / restaurées séparément ou ensemble.
 
 ## Préférences de travail de l'utilisateur
 - Réponses en français, structurées (Objectif, Analyse, Fichiers, Code, Validation, Limites, Suite).

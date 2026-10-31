@@ -24,6 +24,13 @@ public enum Merge {
     }
 }
 
+extension Merge {
+    /// Remplace les fenêtres enregistrées d'une seule application, sans toucher aux autres.
+    public static func replaceApp(old: [AppWindowState], new: [AppWindowState], bundleID: String) -> [AppWindowState] {
+        old.filter { $0.bundleID != bundleID } + new.filter { $0.bundleID == bundleID }
+    }
+}
+
 public enum WindowMatcher {
     public struct Candidate: Equatable, Sendable {
         public var title: String

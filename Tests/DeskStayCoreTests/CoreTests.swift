@@ -141,9 +141,31 @@ final class LogicTests: XCTestCase {
     func testSettingsDecodeToleratesMissingKeys() throws {
         let s = try JSONDecoder().decode(Settings.self, from: Data(#"{"restoreOnWake": false}"#.utf8))
         XCTAssertFalse(s.restoreOnWake)
-        XCTAssertTrue(s.restoreOnDisplayChange)
-        XCTAssertTrue(s.includeAppWindows)
+        XCTAssertFalse(s.restoreOnDisplayChange)
+        XCTAssertFalse(s.restoreAtLaunch)
+        XCTAssertEqual(s.excludedApps, [])
         XCTAssertNil(s.activeArrangementID)
+    }
+
+    func testSettingsIgnoreRemovedKeysAndKeepExclusions() throws {
+        let raw = #"{"includeAppWindows": false, "restoreOnWake": true, "excludedApps": ["app.x"]}"#
+        let s = try JSONDecoder().decode(Settings.self, from: Data(raw.utf8))
+        XCTAssertTrue(s.restoreOnWake)
+        XCTAssertEqual(s.excludedApps, ["app.x"])
+    }
+
+    func testReplaceAppTouchesOnlyThatApp() {
+        let old = [win("app.a", "x", 0), win("app.b", "y", 0), win("app.a", "x2", 1)]
+        let new = [win("app.a", "z", 0), win("app.c", "ignorée", 0)]
+        let merged = Merge.replaceApp(old: old, new: new, bundleID: "app.a")
+        XCTAssertEqual(merged.map(\.title), ["y", "z"])
+        XCTAssertEqual(Merge.replaceApp(old: old, new: [], bundleID: "app.a").map(\.title), ["y"])
+    }
+
+    func testPartsCombinations() {
+        XCTAssertTrue(Parts.all.contains(.icons))
+        XCTAssertFalse(Parts.windows.contains(.icons))
+        XCTAssertTrue(Parts.windows.contains(.finderWindows) && Parts.windows.contains(.appWindows))
     }
 }
 

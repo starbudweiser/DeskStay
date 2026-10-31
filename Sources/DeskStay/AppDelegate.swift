@@ -114,28 +114,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if c.store.isReadOnly { menu.addItem(info("⚠︎ Lecture seule : données non chargées")) }
         menu.addItem(.separator())
 
-        if let active = c.activeArrangement {
-            let id = active.id
-            menu.addItem(ClosureMenuItem("Restaurer « \(active.name) »", key: "r") { [weak self] in self?.restore(id) })
-            menu.addItem(ClosureMenuItem("Mémoriser dans « \(active.name) »", key: "m") { [weak self] in
-                self?.memorize(into: id, purge: false)
-            })
-            let purge = ClosureMenuItem("Mémoriser et oublier les absents", key: "m", modifiers: [.command, .option]) { [weak self] in
-                self?.memorize(into: id, purge: true)
-            }
-            purge.isAlternate = true
-            menu.addItem(purge)
-        } else {
-            menu.addItem(info("Aucun arrangement actif"))
-        }
-        menu.addItem(ClosureMenuItem("Nouvel arrangement…", key: "n") { [weak self] in self?.newArrangement() })
-        menu.addItem(arrangementsItem(currentKey: key))
+        let activeID = c.activeArrangement?.id
+        menu.addItem(info(c.activeArrangement.map { "Arrangement : « \($0.name) »" } ?? "Aucun arrangement actif"))
         menu.addItem(.separator())
 
+        // Icônes du Bureau (type DIM)
+        menu.addItem(.sectionHeader(title: "Icônes du Bureau"))
+        menu.addItem(ClosureMenuItem("Mémoriser les icônes") { [weak self] in self?.memorize(into: activeID, purge: false, parts: .icons) })
+        if let activeID {
+            menu.addItem(ClosureMenuItem("Restaurer les icônes") { [weak self] in self?.restore(activeID, parts: .icons) })
+        }
         menu.addItem(ClosureMenuItem(c.hider.isHidden ? "Afficher les icônes du Bureau" : "Masquer les icônes du Bureau",
                                      key: "h") { [weak self] in self?.controller?.hider.toggle() })
         menu.addItem(.separator())
-        menu.addItem(includeItem())
+
+        // Fenêtres (type Stay)
+        menu.addItem(.sectionHeader(title: "Fenêtres"))
+        menu.addItem(ClosureMenuItem("Mémoriser toutes les fenêtres") { [weak self] in self?.memorize(into: activeID, purge: false, parts: .windows) })
+        if let activeID {
+            menu.addItem(ClosureMenuItem("Restaurer toutes les fenêtres") { [weak self] in self?.restore(activeID, parts: .windows) })
+        }
+        menu.addItem(applicationsItem(active: c.activeArrangement))
+        menu.addItem(.separator())
+
+        // Tout
+        if let activeID {
+            menu.addItem(ClosureMenuItem("Tout restaurer", key: "r") { [weak self] in self?.restore(activeID, parts: .all) })
+        }
+        menu.addItem(ClosureMenuItem("Tout mémoriser", key: "m") { [weak self] in self?.memorize(into: activeID, purge: false, parts: .all) })
+        let purge = ClosureMenuItem("Tout mémoriser et oublier les absents", key: "m", modifiers: [.command, .option]) { [weak self] in
+            self?.memorize(into: activeID, purge: true, parts: .all)
+        }
+        purge.isAlternate = true
+        menu.addItem(purge)
+        menu.addItem(ClosureMenuItem("Nouvel arrangement…", key: "n") { [weak self] in self?.newArrangement() })
+        menu.addItem(arrangementsItem(currentKey: key))
+        menu.addItem(.separator())
         menu.addItem(autoRestoreItem())
         menu.addItem(loginItem())
         if !WindowBridge.isTrusted {
@@ -170,8 +184,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             if a.displayKey == currentKey { summary += " · ces écrans" }
             actions.addItem(info(summary))
             actions.addItem(.separator())
-            actions.addItem(ClosureMenuItem("Restaurer") { [weak self] in self?.restore(id) })
-            actions.addItem(ClosureMenuItem("Mémoriser ici") { [weak self] in self?.memorize(into: id, purge: false) })
+            actions.addItem(ClosureMenuItem("Tout restaurer") { [weak self] in self?.restore(id) })
+            actions.addItem(ClosureMenuItem("Restaurer les icônes") { [weak self] in self?.restore(id, parts: .icons) })
+            actions.addItem(ClosureMenuItem("Restaurer les fenêtres") { [weak self] in self?.restore(id, parts: .windows) })
+            actions.addItem(.separator())
+            actions.addItem(ClosureMenuItem("Tout mémoriser ici") { [weak self] in self?.memorize(into: id, purge: false) })
+            actions.addItem(ClosureMenuItem("Mémoriser les icônes ici") { [weak self] in self?.memorize(into: id, purge: false, parts: .icons) })
+            actions.addItem(ClosureMenuItem("Mémoriser les fenêtres ici") { [weak self] in self?.memorize(into: id, purge: false, parts: .windows) })
+            actions.addItem(.separator())
             actions.addItem(ClosureMenuItem("Définir comme actif") { [weak self] in
                 guard let self, let c = self.controller else { return }
                 if let error = c.updateSettings({ $0.activeArrangementID = id }) { self.showError(error) }
@@ -194,13 +214,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return item
     }
 
-    private func includeItem() -> NSMenuItem {
-        let root = NSMenuItem(title: "Inclure", action: nil, keyEquivalent: "")
+    /// Choix app par app : mémoriser / restaurer une seule application, ou l'exclure (« Ne pas déplacer »).
+    private func applicationsItem(active: Arrangement?) -> NSMenuItem {
+        let root = NSMenuItem(title: "Applications", action: nil, keyEquivalent: "")
         let sub = NSMenu()
-        guard let s = controller?.settings else { return root }
-        sub.addItem(toggle("Icônes du Bureau", s.includeDesktopIcons) { $0.includeDesktopIcons.toggle() })
-        sub.addItem(toggle("Fenêtres Finder", s.includeFinderWindows) { $0.includeFinderWindows.toggle() })
-        sub.addItem(toggle("Fenêtres d'applications", s.includeAppWindows) { $0.includeAppWindows.toggle() })
+        guard let c = controller else { return root }
+        let excluded = Set(c.settings.excludedApps)
+        let apps = WindowBridge.candidateApps().sorted {
+            ($0.localizedName ?? "").localizedStandardCompare($1.localizedName ?? "") == .orderedAscending
+        }
+        if apps.isEmpty { sub.addItem(info("Aucune application ouverte")) }
+        for app in apps {
+            guard let bundleID = app.bundleIdentifier else { continue }
+            let name = app.localizedName ?? bundleID
+            let isExcluded = excluded.contains(bundleID)
+            let item = NSMenuItem(title: isExcluded ? "\(name) — ne pas déplacer" : name, action: nil, keyEquivalent: "")
+            let actions = NSMenu()
+            let saved = active?.appWindows.filter { $0.bundleID == bundleID }.count ?? 0
+            actions.addItem(info(saved > 0 ? "\(saved) fenêtre(s) mémorisée(s)" : "Aucune fenêtre mémorisée"))
+            actions.addItem(.separator())
+            let activeID = active?.id
+            actions.addItem(ClosureMenuItem("Mémoriser ses fenêtres") { [weak self] in
+                self?.memorize(into: activeID, purge: false, parts: .appWindows, onlyApp: bundleID)
+            })
+            if let activeID, saved > 0 {
+                actions.addItem(ClosureMenuItem("Restaurer ses fenêtres") { [weak self] in
+                    self?.restore(activeID, parts: .appWindows, onlyApp: bundleID)
+                })
+            }
+            actions.addItem(toggle("Ne pas déplacer", isExcluded) {
+                if let i = $0.excludedApps.firstIndex(of: bundleID) { $0.excludedApps.remove(at: i) } else { $0.excludedApps.append(bundleID) }
+            })
+            item.submenu = actions
+            sub.addItem(item)
+        }
         root.submenu = sub
         return root
     }
@@ -225,15 +272,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Actions
 
-    private func restore(_ id: UUID) {
+    private func restore(_ id: UUID, parts: Parts = .all, onlyApp: String? = nil) {
         guard let c = controller, let a = c.store.arrangement(id: id) else { return }
-        present(c.restore(a), title: "Restauration incomplète")
+        if parts.contains(.appWindows), !WindowBridge.isTrusted { WindowBridge.requestTrust() }
+        present(c.restore(a, parts: parts, onlyApp: onlyApp), title: "Restauration incomplète")
     }
 
-    private func memorize(into id: UUID?, purge: Bool, newName: String? = nil) {
+    private func memorize(into id: UUID?, purge: Bool, newName: String? = nil, parts: Parts = .all, onlyApp: String? = nil) {
         guard let c = controller else { return }
-        if c.settings.includeAppWindows, !WindowBridge.isTrusted { WindowBridge.requestTrust() }
-        present(c.memorize(arrangementID: id, newName: newName, purgeMissing: purge), title: "Mémorisation incomplète")
+        if parts.contains(.appWindows), !WindowBridge.isTrusted { WindowBridge.requestTrust() }
+        present(c.memorize(arrangementID: id, newName: newName, purgeMissing: purge, parts: parts, onlyApp: onlyApp),
+                title: "Mémorisation incomplète")
     }
 
     private func newArrangement() {

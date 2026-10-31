@@ -57,8 +57,10 @@ final class Controller {
 
     // MARK: Mémoriser
 
-    /// `arrangementID == nil` : crée un nouvel arrangement nommé `newName` et le rend actif.
-    func memorize(arrangementID: UUID?, newName: String?, purgeMissing: Bool) -> Report {
+    /// `arrangementID == nil` : crée un arrangement (nommé `newName`, sinon daté) et le rend actif.
+    /// `onlyApp` : limite la partie « fenêtres d'applications » à une seule application (identifiant de paquet).
+    func memorize(arrangementID: UUID?, newName: String?, purgeMissing: Bool,
+                  parts: Parts = .all, onlyApp: String? = nil) -> Report {
         var report = Report()
         let displays = Displays.current()
         guard !displays.isEmpty else {
@@ -72,10 +74,9 @@ final class Controller {
             arrangement = Arrangement(name: newName ?? defaultName())
         }
 
-        let s = settings
         var capturedSomething = false
 
-        if s.includeDesktopIcons {
+        if parts.contains(.icons) {
             do {
                 let icons = try finder().readDesktop(displays: displays)
                 arrangement.desktopIcons = Merge.desktopIcons(old: arrangement.desktopIcons, new: icons, purgeMissing: purgeMissing)
@@ -86,7 +87,7 @@ final class Controller {
             }
         }
 
-        if s.includeFinderWindows {
+        if parts.contains(.finderWindows), onlyApp == nil {
             do {
                 let windows = try finder().readFinderWindows()
                 arrangement.finderWindows = windows
@@ -97,10 +98,19 @@ final class Controller {
             }
         }
 
-        if s.includeAppWindows {
+        if parts.contains(.appWindows) {
             if WindowBridge.isTrusted {
-                let windows = WindowBridge.capture(displays: displays)
-                arrangement.appWindows = Merge.appWindows(old: arrangement.appWindows, new: windows, purgeMissing: purgeMissing)
+                let excluded = Set(settings.excludedApps)
+                let apps = WindowBridge.candidateApps().filter { app in
+                    guard let id = app.bundleIdentifier else { return false }
+                    return onlyApp.map { $0 == id } ?? !excluded.contains(id)
+                }
+                let windows = WindowBridge.capture(displays: displays, apps: apps)
+                if let onlyApp {
+                    arrangement.appWindows = Merge.replaceApp(old: arrangement.appWindows, new: windows, bundleID: onlyApp)
+                } else {
+                    arrangement.appWindows = Merge.appWindows(old: arrangement.appWindows, new: windows, purgeMissing: purgeMissing)
+                }
                 report.done.append("\(windows.count) fenêtres d'apps")
                 capturedSomething = true
             } else {
@@ -133,39 +143,39 @@ final class Controller {
 
     // MARK: Restaurer
 
-    func restore(_ arrangement: Arrangement) -> Report {
+    func restore(_ arrangement: Arrangement, parts: Parts = .all, onlyApp: String? = nil) -> Report {
         var report = Report()
         let displays = Displays.current()
         guard !displays.isEmpty else {
             report.problems.append("Aucun écran détecté.")
             return report
         }
-        let s = settings
 
-        if s.includeFinderWindows, !arrangement.finderWindows.isEmpty {
+        // Seules les fenêtres Finder déjà ouvertes sont replacées : aucune n'est rouverte.
+        if parts.contains(.finderWindows), onlyApp == nil, !arrangement.finderWindows.isEmpty {
             do {
                 let bridge = try finder()
                 var ok = 0
+                var closed = 0
                 for window in arrangement.finderWindows {
                     guard FileManager.default.fileExists(atPath: window.path) else {
                         report.problems.append("Dossier introuvable : \(window.path)")
                         continue
                     }
                     do {
-                        try bridge.restoreFinderWindow(window, displays: displays)
-                        ok += 1
+                        if try bridge.restoreFinderWindow(window, displays: displays) { ok += 1 } else { closed += 1 }
                     } catch {
                         report.problems.append("Fenêtre \(window.path) : \(error.localizedDescription)")
                         if (error as? BridgeError)?.isAutomationDenied == true { break }
                     }
                 }
-                report.done.append("\(ok)/\(arrangement.finderWindows.count) fenêtres Finder")
+                report.done.append("\(ok) fenêtres Finder" + (closed > 0 ? " (\(closed) fermées, ignorées)" : ""))
             } catch {
                 report.problems.append("Fenêtres Finder : \(error.localizedDescription)")
             }
         }
 
-        if s.includeDesktopIcons, !arrangement.desktopIcons.isEmpty {
+        if parts.contains(.icons), !arrangement.desktopIcons.isEmpty {
             do {
                 let moved = try finder().restoreDesktop(arrangement.desktopIcons, displays: displays)
                 report.done.append("\(moved)/\(arrangement.desktopIcons.count) icônes")
@@ -174,15 +184,21 @@ final class Controller {
             }
         }
 
-        if s.includeAppWindows, !arrangement.appWindows.isEmpty {
-            if WindowBridge.isTrusted {
-                let r = WindowBridge.restore(arrangement.appWindows, displays: displays)
-                var text = "\(r.moved) fenêtres d'apps"
-                if r.notFound > 0 { text += " (\(r.notFound) absentes)" }
-                report.done.append(text)
-                if r.failed > 0 { report.problems.append("\(r.failed) fenêtre(s) ont refusé d'être déplacées.") }
-            } else {
-                report.problems.append("Fenêtres d'applications : accès Accessibilité non accordé.")
+        if parts.contains(.appWindows) {
+            let excluded = Set(settings.excludedApps)
+            let saved = arrangement.appWindows.filter { state in
+                onlyApp.map { $0 == state.bundleID } ?? !excluded.contains(state.bundleID)
+            }
+            if !saved.isEmpty {
+                if WindowBridge.isTrusted {
+                    let r = WindowBridge.restore(saved, displays: displays)
+                    var text = "\(r.moved) fenêtres d'apps"
+                    if r.notFound > 0 { text += " (\(r.notFound) absentes)" }
+                    report.done.append(text)
+                    if r.failed > 0 { report.problems.append("\(r.failed) fenêtre(s) ont refusé d'être déplacées.") }
+                } else {
+                    report.problems.append("Fenêtres d'applications : accès Accessibilité non accordé.")
+                }
             }
         }
 

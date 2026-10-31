@@ -143,32 +143,41 @@ public struct Arrangement: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// Ce que mémoriser / restaurer concerne : icônes du Bureau (type DIM) et/ou fenêtres (type Stay).
+public struct Parts: OptionSet, Sendable {
+    public let rawValue: Int
+    public init(rawValue: Int) { self.rawValue = rawValue }
+
+    public static let icons = Parts(rawValue: 1)
+    public static let finderWindows = Parts(rawValue: 2)
+    public static let appWindows = Parts(rawValue: 4)
+    public static let windows: Parts = [.finderWindows, .appWindows]
+    public static let all: Parts = [.icons, .finderWindows, .appWindows]
+}
+
 public struct Settings: Codable, Equatable, Sendable {
     public var activeArrangementID: UUID?
-    public var restoreOnDisplayChange = true
-    public var restoreOnWake = true
+    /// Aucune restauration automatique par défaut : tout se fait à la demande.
+    public var restoreOnDisplayChange = false
+    public var restoreOnWake = false
     public var restoreAtLaunch = false
-    public var includeDesktopIcons = true
-    public var includeFinderWindows = true
-    public var includeAppWindows = true
+    /// Applications dont les fenêtres ne sont jamais mémorisées ni déplacées (« Ne pas déplacer »).
+    public var excludedApps: [String] = []
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case activeArrangementID, restoreOnDisplayChange, restoreOnWake, restoreAtLaunch
-        case includeDesktopIcons, includeFinderWindows, includeAppWindows
+        case activeArrangementID, restoreOnDisplayChange, restoreOnWake, restoreAtLaunch, excludedApps
     }
 
     /// Décodage tolérant : une clé absente (fichier d'une version antérieure) prend sa valeur par défaut.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         activeArrangementID = try c.decodeIfPresent(UUID.self, forKey: .activeArrangementID)
-        restoreOnDisplayChange = try c.decodeIfPresent(Bool.self, forKey: .restoreOnDisplayChange) ?? true
-        restoreOnWake = try c.decodeIfPresent(Bool.self, forKey: .restoreOnWake) ?? true
+        restoreOnDisplayChange = try c.decodeIfPresent(Bool.self, forKey: .restoreOnDisplayChange) ?? false
+        restoreOnWake = try c.decodeIfPresent(Bool.self, forKey: .restoreOnWake) ?? false
         restoreAtLaunch = try c.decodeIfPresent(Bool.self, forKey: .restoreAtLaunch) ?? false
-        includeDesktopIcons = try c.decodeIfPresent(Bool.self, forKey: .includeDesktopIcons) ?? true
-        includeFinderWindows = try c.decodeIfPresent(Bool.self, forKey: .includeFinderWindows) ?? true
-        includeAppWindows = try c.decodeIfPresent(Bool.self, forKey: .includeAppWindows) ?? true
+        excludedApps = try c.decodeIfPresent([String].self, forKey: .excludedApps) ?? []
     }
 }
 

@@ -118,16 +118,19 @@ final class FinderBridge {
         return windows
     }
 
-    func restoreFinderWindow(_ window: FinderWindowState, displays: [DisplaySnapshot]) throws {
+    /// Ne replace que les fenêtres déjà ouvertes : retourne `false` si le dossier n'a pas de fenêtre.
+    @discardableResult
+    func restoreFinderWindow(_ window: FinderWindowState, displays: [DisplaySnapshot]) throws -> Bool {
         let r = Geometry.fit(window.bounds.cgRect, in: displays)
         let bounds = [Int(r.minX.rounded()), Int(r.minY.rounded()), Int(r.maxX.rounded()), Int(r.maxY.rounded())]
         let icons = window.isIconView ? window.icons : []
-        _ = try call("restorefinderwindow",
+        let result = try call("restorefinderwindow",
                      NSAppleEventDescriptor(string: window.path),
                      .list(ints: bounds),
                      .list(strings: icons.map(\.name)),
                      .list(ints: icons.map { Int($0.x.rounded()) }),
                      .list(ints: icons.map { Int($0.y.rounded()) }))
+        return result.booleanValue
     }
 
     // MARK: Appel de gestionnaire AppleScript
@@ -222,11 +225,7 @@ final class FinderBridge {
                     if (POSIX path of ((target of x) as alias)) is p then set w to x
                 end try
             end repeat
-            if w is missing value then
-                open f
-                delay 0.3
-                set w to Finder window 1
-            end if
+            if w is missing value then return false
             set bounds of w to b
             if (count of theNames) > 0 then
                 try

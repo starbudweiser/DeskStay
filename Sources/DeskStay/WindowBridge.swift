@@ -47,9 +47,9 @@ enum WindowBridge {
         return result
     }
 
-    static func capture(displays: [DisplaySnapshot]) -> [AppWindowState] {
+    static func capture(displays: [DisplaySnapshot], apps: [NSRunningApplication]) -> [AppWindowState] {
         var states: [AppWindowState] = []
-        for app in candidateApps() {
+        for app in apps {
             guard let bundleID = app.bundleIdentifier else { continue }
             for w in windows(of: app) {
                 let center = CGPoint(x: w.frame.midX, y: w.frame.midY)

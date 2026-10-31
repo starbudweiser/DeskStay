@@ -26,14 +26,17 @@ enum SelfTest {
             WindowBridge.requestTrust()
         case "memorize":
             let id = controller.activeArrangement?.id
-            printReport(controller.memorize(arrangementID: id, newName: id == nil ? "Essai" : nil, purgeMissing: false))
+            let (parts, app) = parse(arguments.count > 4 ? arguments[4] : "all")
+            printReport(controller.memorize(arrangementID: id, newName: id == nil ? "Essai" : nil, purgeMissing: false,
+                                            parts: parts, onlyApp: app))
             print(controller.lastStatus)
         case "restore":
             guard let active = controller.activeArrangement else {
                 print("ÉCHEC : aucun arrangement actif")
                 exit(1)
             }
-            printReport(controller.restore(active))
+            let (parts, app) = parse(arguments.count > 4 ? arguments[4] : "all")
+            printReport(controller.restore(active, parts: parts, onlyApp: app))
             print(controller.lastStatus)
         case "hide":
             let seconds = arguments.count > 4 ? Double(arguments[4]) ?? 5 : 5
@@ -76,6 +79,14 @@ enum SelfTest {
         }
         NSApplication.shared.run()
         exit(1)
+    }
+
+    /// `all`, `icons`, `windows` ou `app:<identifiant de paquet>`.
+    private static func parse(_ text: String) -> (Parts, String?) {
+        if text == "icons" { return (.icons, nil) }
+        if text == "windows" { return (.windows, nil) }
+        if text.hasPrefix("app:") { return (.appWindows, String(text.dropFirst(4))) }
+        return (.all, nil)
     }
 
     private static func printReport(_ report: Controller.Report) {
