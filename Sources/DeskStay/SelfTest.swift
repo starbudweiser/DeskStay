@@ -51,6 +51,9 @@ enum SelfTest {
             controller.scheduleAutoRestore(reason: "essai-2", after: 0.5)
             RunLoop.main.run(until: Date().addingTimeInterval(arguments.count > 4 ? Double(arguments[4]) ?? 8 : 8))
             print(controller.lastStatus)
+        case "about":
+            About.show()
+            RunLoop.main.run(until: Date().addingTimeInterval(arguments.count > 4 ? Double(arguments[4]) ?? 4 : 4))
         case "events":
             runEvents(directory: store.directory)
         default:

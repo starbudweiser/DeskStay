@@ -32,6 +32,7 @@ Références :
 - Compiler : `swift build`
 - Tests : `swift test` (21 tests XCTest, tous verts au 31/10/2026)
 - App : `./build.sh` → `~/Applications/Utilitaires+/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
+- À propos : `About.swift` (fr/en/es/it selon la langue du système), licence MIT dans `LICENSE`, auteurs « Starbudweiser & Claude Code ». Le reste de l'interface est encore en français seulement.
 - Icône : `assets/make_icon.py` (PyQt6, couleurs Socle) produit `assets/icon.icns` ; `build.sh` la copie dans l'app.
 - Essais réels : `SELFTEST=1 ./build.sh` (reste dans build/), puis `build/DeskStay.app/Contents/MacOS/DeskStay --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
 

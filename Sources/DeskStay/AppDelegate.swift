@@ -160,6 +160,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             NSWorkspace.shared.open(dir)
         })
         menu.addItem(.separator())
+        menu.addItem(ClosureMenuItem(About.menuTitle) { About.show() })
         menu.addItem(ClosureMenuItem("Quitter DeskStay", key: "q") { NSApp.terminate(nil) })
     }
 

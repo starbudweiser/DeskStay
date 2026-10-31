@@ -26,6 +26,8 @@
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2026 Starbudweiser</string>
     <key>NSAppleEventsUsageDescription</key>
     <string>DeskStay pilote le Finder pour mémoriser et restaurer la position des icônes et des fenêtres.</string>
     <key>NSHighResolutionCapable</key>
