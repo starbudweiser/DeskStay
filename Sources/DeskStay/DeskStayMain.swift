@@ -4,6 +4,9 @@ import AppKit
 enum DeskStayMain {
     @MainActor
     static func main() {
+        #if DESKSTAY_SELFTEST
+        if SelfTest.runIfRequested(CommandLine.arguments) { return }
+        #endif
         let app = NSApplication.shared
         let delegate = AppDelegate()
         app.delegate = delegate

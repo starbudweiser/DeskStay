@@ -22,13 +22,20 @@ final class ClosureMenuItem: NSMenuItem {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
-    private var controller: Controller?
+    private(set) var controller: Controller?
     private let menu = NSMenu()
+    #if DESKSTAY_SELFTEST
+    var dataDirectoryOverride: URL?
+    #endif
 
     // MARK: Cycle de vie
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let store = ArrangementStore(directory: Self.dataDirectory())
+        var directory = Self.dataDirectory()
+        #if DESKSTAY_SELFTEST
+        if let dataDirectoryOverride { directory = dataDirectoryOverride }
+        #endif
+        let store = ArrangementStore(directory: directory)
         do {
             if case .recoveredFromCorrupt(let name) = try store.load() {
                 showAlert("Fichier de données illisible",

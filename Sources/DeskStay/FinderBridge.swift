@@ -189,8 +189,10 @@ final class FinderBridge {
     on readFinderWindows(maxIcons)
         set res to {}
         tell application "Finder"
-            repeat with w in (every Finder window)
+            -- Pas de « repeat with w in every Finder window » : le Finder y lit les éléments du dossier affiché.
+            repeat with i from 1 to count of Finder windows
                 try
+                    set w to Finder window i
                     set t to target of w
                     set p to POSIX path of (t as alias)
                     set b to bounds of w
@@ -214,9 +216,10 @@ final class FinderBridge {
         tell application "Finder"
             set f to (POSIX file p) as alias
             set w to missing value
-            repeat with x in (every Finder window)
+            repeat with i from 1 to count of Finder windows
                 try
-                    if (POSIX path of ((target of x) as alias)) is p then set w to contents of x
+                    set x to Finder window i
+                    if (POSIX path of ((target of x) as alias)) is p then set w to x
                 end try
             end repeat
             if w is missing value then
