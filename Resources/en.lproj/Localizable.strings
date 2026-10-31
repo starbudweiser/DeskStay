@@ -110,6 +110,7 @@
 "store.readOnly" = "The data could not be loaded: saving is disabled so the existing file is not overwritten.";
 "about.menu" = "About DeskStay";
 "about.tagline" = "Remembers and restores the position of desktop icons and windows, for each combination of displays.";
+"about.version" = "Version %@ (%@)";
 "about.authors" = "By Starbudweiser & Claude Code (Anthropic).";
 "about.license" = "MIT License. © 2026 Starbudweiser.";
 "about.disclaimer" = "Provided \"as is\", without warranty of any kind.";

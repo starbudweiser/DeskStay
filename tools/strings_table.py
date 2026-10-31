@@ -121,6 +121,7 @@ T = [
 # --- à propos
 ("about.menu", "À propos de DeskStay", "About DeskStay", "Acerca de DeskStay", "Informazioni su DeskStay"),
 ("about.tagline", "Mémorise et restaure la position des icônes du Bureau et des fenêtres, par combinaison d'écrans.", "Remembers and restores the position of desktop icons and windows, for each combination of displays.", "Memoriza y restaura la posición de los iconos del Escritorio y de las ventanas, según la combinación de pantallas.", "Memorizza e ripristina la posizione delle icone della Scrivania e delle finestre, per ogni combinazione di schermi."),
+("about.version", "Version %@ (%@)", "Version %@ (%@)", "Versión %@ (%@)", "Versione %@ (%@)"),
 ("about.authors", "Par Starbudweiser & Claude Code (Anthropic).", "By Starbudweiser & Claude Code (Anthropic).", "Por Starbudweiser y Claude Code (Anthropic).", "Di Starbudweiser e Claude Code (Anthropic)."),
 ("about.license", "Licence MIT. © 2026 Starbudweiser.", "MIT License. © 2026 Starbudweiser.", "Licencia MIT. © 2026 Starbudweiser.", "Licenza MIT. © 2026 Starbudweiser."),
 ("about.disclaimer", "Logiciel fourni « en l'état », sans garantie d'aucune sorte.", "Provided \"as is\", without warranty of any kind.", "Software proporcionado «tal cual», sin garantía de ningún tipo.", "Software fornito «così com'è», senza garanzie di alcun tipo."),

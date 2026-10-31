@@ -110,6 +110,7 @@
 "store.readOnly" = "No se pudieron cargar los datos: el guardado está desactivado para no sobrescribir el archivo existente.";
 "about.menu" = "Acerca de DeskStay";
 "about.tagline" = "Memoriza y restaura la posición de los iconos del Escritorio y de las ventanas, según la combinación de pantallas.";
+"about.version" = "Versión %@ (%@)";
 "about.authors" = "Por Starbudweiser y Claude Code (Anthropic).";
 "about.license" = "Licencia MIT. © 2026 Starbudweiser.";
 "about.disclaimer" = "Software proporcionado «tal cual», sin garantía de ningún tipo.";

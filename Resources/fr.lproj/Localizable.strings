@@ -110,6 +110,7 @@
 "store.readOnly" = "Les données n'ont pas pu être chargées : l'enregistrement est désactivé pour ne pas écraser le fichier existant.";
 "about.menu" = "À propos de DeskStay";
 "about.tagline" = "Mémorise et restaure la position des icônes du Bureau et des fenêtres, par combinaison d'écrans.";
+"about.version" = "Version %@ (%@)";
 "about.authors" = "Par Starbudweiser & Claude Code (Anthropic).";
 "about.license" = "Licence MIT. © 2026 Starbudweiser.";
 "about.disclaimer" = "Logiciel fourni « en l'état », sans garantie d'aucune sorte.";

@@ -110,6 +110,7 @@
 "store.readOnly" = "Impossibile caricare i dati: il salvataggio è disattivato per non sovrascrivere il file esistente.";
 "about.menu" = "Informazioni su DeskStay";
 "about.tagline" = "Memorizza e ripristina la posizione delle icone della Scrivania e delle finestre, per ogni combinazione di schermi.";
+"about.version" = "Versione %@ (%@)";
 "about.authors" = "Di Starbudweiser e Claude Code (Anthropic).";
 "about.license" = "Licenza MIT. © 2026 Starbudweiser.";
 "about.disclaimer" = "Software fornito «così com'è», senza garanzie di alcun tipo.";
