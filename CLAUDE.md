@@ -31,8 +31,8 @@ Références :
 ## Commandes
 - Compiler : `swift build`
 - Tests : `swift test` (21 tests XCTest, tous verts au 31/10/2026)
-- App : `./build.sh` → `build/DeskStay.app` (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
-- Essais réels : `SELFTEST=1 ./build.sh`, puis `build/DeskStay.app/Contents/MacOS/DeskStay --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
+- App : `./build.sh` → `~/Applications/Utilitaires+/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
+- Essais réels : `SELFTEST=1 ./build.sh` (reste dans build/), puis `build/DeskStay.app/Contents/MacOS/DeskStay --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
 
 ## Points ouverts
 - **Signature / notarisation bloquées** : le mot de passe du trousseau « session » ne correspond pas au mot de passe de session (vérifié avec `dscl . -authonly`), donc `codesign` ne peut pas utiliser la clé Developer ID `B675FD78…` (trousseau session). Une 2e identité Developer ID (`CB7AAA54…`) est dans `skyrim-signing.keychain-db`. Ne jamais réinitialiser le trousseau sans accord explicite.
