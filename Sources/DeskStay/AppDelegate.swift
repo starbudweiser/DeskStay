@@ -59,6 +59,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = item
 
         observeSystemEvents()
+        Task { @MainActor [weak controller] in
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            controller?.warmUp()
+        }
         if controller.settings.restoreAtLaunch {
             controller.scheduleAutoRestore(reason: "ouverture", after: 4)
         }

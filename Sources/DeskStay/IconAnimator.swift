@@ -9,10 +9,19 @@ import DeskStayCore
 /// quand le fil principal attend le Finder). Les icônes qui ne bougent pas ne sont pas touchées.
 @MainActor
 enum IconAnimator {
-    static var duration: CFTimeInterval = 0.35
+    static var duration: CFTimeInterval = 0.25
     private static let cellWidth: CGFloat = 112
     private static let labelHeight: CGFloat = 36
     private static let labelGap: CGFloat = 4
+
+    private static var cachedStyle: (iconSize: Int, textSize: Int)?
+
+    /// Lit une fois la taille des icônes et du texte : évite un aller-retour avec le Finder avant chaque animation.
+    @discardableResult
+    static func warm(_ bridge: FinderBridge) -> (iconSize: Int, textSize: Int) {
+        if let style = try? bridge.readDesktopStyle() { cachedStyle = style }
+        return cachedStyle ?? (iconSize: 64, textSize: 12)
+    }
 
     private struct Move {
         let name: String
@@ -28,12 +37,10 @@ enum IconAnimator {
         guard !moves.isEmpty, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else {
             return try bridge.restoreDesktop(icons, displays: displays)
         }
-        let style = (try? bridge.readDesktopStyle()) ?? (iconSize: 64, textSize: 12)
+        let style = cachedStyle ?? warm(bridge)
         let stage = Stage(moves: moves, iconSize: CGFloat(style.iconSize), textSize: CGFloat(style.textSize))
         guard stage.isReady else { return try bridge.restoreDesktop(icons, displays: displays) }
-
         stage.show()
-        pump(0.08)
         stage.startAnimation()
         let started = CACurrentMediaTime()
         defer { stage.close() }
@@ -42,6 +49,7 @@ enum IconAnimator {
         if remaining > 0 { pump(remaining) }
         stage.fadeOut()
         pump(0.12)
+        warm(bridge)
         return moved
     }
 
@@ -130,14 +138,7 @@ enum IconAnimator {
 
         func show() {
             for surface in surfaces.values {
-                surface.root.opacity = 0
                 surface.window.orderFrontRegardless()
-                let fade = CABasicAnimation(keyPath: "opacity")
-                fade.fromValue = 0
-                fade.toValue = 1
-                fade.duration = 0.07
-                surface.root.opacity = 1
-                surface.root.add(fade, forKey: "fadeIn")
             }
             CATransaction.flush()
         }
@@ -148,7 +149,8 @@ enum IconAnimator {
                 slide.fromValue = NSValue(point: traveller.from)
                 slide.toValue = NSValue(point: traveller.to)
                 slide.duration = IconAnimator.duration
-                slide.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                // départ immédiat, arrivée en douceur : aucun temps mort avant le mouvement
+                slide.timingFunction = CAMediaTimingFunction(controlPoints: 0.15, 0.85, 0.25, 1)
                 traveller.layer.position = traveller.to
                 traveller.layer.add(slide, forKey: "slide")
             }

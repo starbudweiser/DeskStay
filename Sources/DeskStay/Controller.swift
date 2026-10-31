@@ -23,6 +23,12 @@ final class Controller {
 
     var settings: Settings { store.data.settings }
 
+    /// Prépare le pont AppleScript (compilation) et la taille des icônes pour que la première restauration soit immédiate.
+    func warmUp() {
+        guard let bridge = try? finder() else { return }
+        IconAnimator.warm(bridge)
+    }
+
     var activeArrangement: Arrangement? { store.arrangement(id: settings.activeArrangementID) }
 
     func updateSettings(_ change: (inout Settings) -> Void) -> Error? {
