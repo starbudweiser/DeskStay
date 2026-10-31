@@ -12,20 +12,20 @@ enum BridgeError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .scriptCompile(let m):
-            return "Script interne invalide : \(m)"
+            return L("bridge.compile", m)
         case .script(let code, let m):
             switch code {
             case BridgeError.automationDenied:
-                return "DeskStay n'est pas autorisé à piloter le Finder (Réglages Système › Confidentialité et sécurité › Automatisation)."
+                return L("bridge.denied")
             case -600, -609:
-                return "Le Finder ne répond pas."
+                return L("bridge.noReply")
             case -1712:
-                return "Le Finder a mis trop de temps à répondre."
+                return L("bridge.timeout")
             default:
-                return "Erreur AppleScript \(code) : \(m)"
+                return L("bridge.appleScript", code, m)
             }
         case .unexpectedResult(let m):
-            return "Réponse inattendue du Finder : \(m)"
+            return L("bridge.unexpected", m)
         }
     }
 
@@ -46,10 +46,10 @@ final class FinderBridge {
     private let script: NSAppleScript
 
     init() throws {
-        guard let s = NSAppleScript(source: Self.source) else { throw BridgeError.scriptCompile("création impossible") }
+        guard let s = NSAppleScript(source: Self.source) else { throw BridgeError.scriptCompile(L("bridge.creation")) }
         var error: NSDictionary?
         guard s.compileAndReturnError(&error) else {
-            throw BridgeError.scriptCompile((error?[NSAppleScript.errorMessage] as? String) ?? "inconnue")
+            throw BridgeError.scriptCompile((error?[NSAppleScript.errorMessage] as? String) ?? L("bridge.unknown"))
         }
         script = s
     }
@@ -59,7 +59,7 @@ final class FinderBridge {
     func readDesktop(displays: [DisplaySnapshot]) throws -> [DesktopIcon] {
         let result = try call("readdesktop")
         let parts = result.listItems
-        guard parts.count == 2 else { throw BridgeError.unexpectedResult("bureau") }
+        guard parts.count == 2 else { throw BridgeError.unexpectedResult(L("bridge.desktop")) }
         let names = parts[0].listItems
         let positions = parts[1].listItems
         var icons: [DesktopIcon] = []
@@ -95,7 +95,7 @@ final class FinderBridge {
     /// Taille des icônes et du texte du Bureau (pour dessiner les copies animées à l'identique).
     func readDesktopStyle() throws -> (iconSize: Int, textSize: Int) {
         let parts = try call("readdesktopstyle").listItems
-        guard parts.count == 2 else { throw BridgeError.unexpectedResult("style du bureau") }
+        guard parts.count == 2 else { throw BridgeError.unexpectedResult(L("bridge.desktopStyle")) }
         return (Int(parts[0].int32Value), Int(parts[1].int32Value))
     }
 
@@ -156,7 +156,7 @@ final class FinderBridge {
         let result: NSAppleEventDescriptor? = script.executeAppleEvent(event, error: &error)
         if let error {
             throw BridgeError.script(code: (error[NSAppleScript.errorNumber] as? Int) ?? 0,
-                                     message: (error[NSAppleScript.errorMessage] as? String) ?? "inconnue")
+                                     message: (error[NSAppleScript.errorMessage] as? String) ?? L("bridge.unknown"))
         }
         guard let result else { throw BridgeError.unexpectedResult(handler) }
         return result

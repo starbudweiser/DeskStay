@@ -1,0 +1,3 @@
+/* DeskStay — en. Fichier généré par tools/gen_strings.py : modifier tools/strings_table.py. */
+"NSAppleEventsUsageDescription" = "DeskStay controls the Finder to save and restore the position of icons and windows.";
+"NSHumanReadableCopyright" = "© 2026 Starbudweiser";

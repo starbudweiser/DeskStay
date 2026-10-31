@@ -102,7 +102,7 @@ enum WindowBridge {
                     result.moved += 1
                 } else {
                     result.failed += 1
-                    result.failures.append("\(state.appName) : \(live[pair.current].title.isEmpty ? "sans titre" : live[pair.current].title)")
+                    result.failures.append("\(state.appName) : \(live[pair.current].title.isEmpty ? L("ctl.untitled") : live[pair.current].title)")
                 }
             }
             result.notFound += states.count - pairs.count

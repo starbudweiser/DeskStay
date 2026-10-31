@@ -3,7 +3,14 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDevelopmentRegion</key>
-    <string>fr</string>
+    <string>en</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>fr</string>
+        <string>en</string>
+        <string>es</string>
+        <string>it</string>
+    </array>
     <key>CFBundleExecutable</key>
     <string>DeskStay</string>
     <key>CFBundleIconFile</key>
@@ -29,7 +36,7 @@
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Starbudweiser</string>
     <key>NSAppleEventsUsageDescription</key>
-    <string>DeskStay pilote le Finder pour mémoriser et restaurer la position des icônes et des fenêtres.</string>
+    <string>DeskStay controls the Finder to save and restore the position of icons and windows.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

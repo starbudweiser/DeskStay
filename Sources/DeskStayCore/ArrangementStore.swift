@@ -7,9 +7,9 @@ public enum StoreError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .unsupportedVersion(let v):
-            return "Le fichier de données a été créé par une version plus récente (format \(v)). Il n'est pas modifié."
+            return L("store.newer", v)
         case .readOnly:
-            return "Les données n'ont pas pu être chargées : l'enregistrement est désactivé pour ne pas écraser le fichier existant."
+            return L("store.readOnly")
         }
     }
 }

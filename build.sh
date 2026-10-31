@@ -20,6 +20,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/DeskStay"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+cp -R Resources/*.lproj "$APP/Contents/Resources/" # textes fr, en, es, it
 cp assets/icon.icns "$APP/Contents/Resources/icon.icns"
 
 if [ -n "${SIGN_IDENTITY:-}" ]; then

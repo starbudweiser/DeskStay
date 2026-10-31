@@ -12,7 +12,7 @@ final class Controller {
 
     let store: ArrangementStore
     let hider = IconHider()
-    private(set) var lastStatus = "Prêt"
+    private(set) var lastStatus = L("ctl.ready")
     private var finderBridge: FinderBridge?
     private var pendingAutoRestore: Task<Void, Never>?
     private let log = Logger(subsystem: "com.stephan.deskstay", category: "controller")
@@ -38,7 +38,7 @@ final class Controller {
             return nil
         } catch {
             log.error("Enregistrement impossible : \(error.localizedDescription, privacy: .public)")
-            setStatus("Échec d'enregistrement")
+            setStatus(L("ctl.saveFailed"))
             return error
         }
     }
@@ -65,7 +65,7 @@ final class Controller {
         var report = Report()
         let displays = Displays.current()
         guard !displays.isEmpty else {
-            report.problems.append("Aucun écran détecté.")
+            report.problems.append(L("ctl.noDisplay"))
             return report
         }
         var arrangement: Arrangement
@@ -81,10 +81,10 @@ final class Controller {
             do {
                 let icons = try finder().readDesktop(displays: displays)
                 arrangement.desktopIcons = Merge.desktopIcons(old: arrangement.desktopIcons, new: icons, purgeMissing: purgeMissing)
-                report.done.append("\(icons.count) icônes")
+                report.done.append(L("ctl.iconsCount", icons.count))
                 capturedSomething = true
             } catch {
-                report.problems.append("Bureau : \(error.localizedDescription)")
+                report.problems.append(L("ctl.errDesktop", error.localizedDescription))
             }
         }
 
@@ -92,10 +92,10 @@ final class Controller {
             do {
                 let windows = try finder().readFinderWindows()
                 arrangement.finderWindows = windows
-                report.done.append("\(windows.count) fenêtres Finder")
+                report.done.append(L("ctl.finderCount", windows.count))
                 capturedSomething = true
             } catch {
-                report.problems.append("Fenêtres Finder : \(error.localizedDescription)")
+                report.problems.append(L("ctl.errFinderWindows", error.localizedDescription))
             }
         }
 
@@ -112,16 +112,16 @@ final class Controller {
                 } else {
                     arrangement.appWindows = Merge.appWindows(old: arrangement.appWindows, new: windows, purgeMissing: purgeMissing)
                 }
-                report.done.append("\(windows.count) fenêtres d'apps")
+                report.done.append(L("ctl.appsCount", windows.count))
                 capturedSomething = true
             } else {
-                report.problems.append("Fenêtres d'applications : accès Accessibilité non accordé.")
+                report.problems.append(L("ctl.errAppsTrust"))
             }
         }
 
         guard capturedSomething else {
-            report.problems.append("Rien n'a été enregistré.")
-            setStatus("Mémorisation échouée")
+            report.problems.append(L("ctl.nothingSaved"))
+            setStatus(L("ctl.memorizeFailed"))
             return report
         }
 
@@ -132,14 +132,14 @@ final class Controller {
             store.data.settings.activeArrangementID = arrangement.id
         }
         if let error = persist() {
-            report.problems.append("Enregistrement : \(error.localizedDescription)")
+            report.problems.append(L("ctl.errSave", error.localizedDescription))
         }
-        setStatus("Mémorisé : " + report.done.joined(separator: ", "))
+        setStatus(L("ctl.memorized", report.done.joined(separator: ", ")))
         return report
     }
 
     private func defaultName() -> String {
-        "Arrangement \(Date().formatted(date: .abbreviated, time: .shortened))"
+        L("arr.defaultName", Date().formatted(date: .abbreviated, time: .shortened))
     }
 
     // MARK: Restaurer
@@ -148,7 +148,7 @@ final class Controller {
         var report = Report()
         let displays = Displays.current()
         guard !displays.isEmpty else {
-            report.problems.append("Aucun écran détecté.")
+            report.problems.append(L("ctl.noDisplay"))
             return report
         }
 
@@ -160,19 +160,19 @@ final class Controller {
                 var closed = 0
                 for window in arrangement.finderWindows {
                     guard FileManager.default.fileExists(atPath: window.path) else {
-                        report.problems.append("Dossier introuvable : \(window.path)")
+                        report.problems.append(L("ctl.folderMissing", window.path))
                         continue
                     }
                     do {
                         if try bridge.restoreFinderWindow(window, displays: displays) { ok += 1 } else { closed += 1 }
                     } catch {
-                        report.problems.append("Fenêtre \(window.path) : \(error.localizedDescription)")
+                        report.problems.append(L("ctl.errWindow", window.path, error.localizedDescription))
                         if (error as? BridgeError)?.isAutomationDenied == true { break }
                     }
                 }
-                report.done.append("\(ok) fenêtres Finder" + (closed > 0 ? " (\(closed) fermées, ignorées)" : ""))
+                report.done.append(closed > 0 ? L("ctl.finderRestoredClosed", ok, closed) : L("ctl.finderRestored", ok))
             } catch {
-                report.problems.append("Fenêtres Finder : \(error.localizedDescription)")
+                report.problems.append(L("ctl.errFinderWindows", error.localizedDescription))
             }
         }
 
@@ -189,9 +189,9 @@ final class Controller {
                     return hypot(a.x - b.x, a.y - b.y) >= 3 // le Finder arrondit à l'entier
                 }
                 let moved = toMove.isEmpty ? 0 : try bridge.restoreDesktop(toMove, displays: displays)
-                report.done.append("\(moved) icônes replacées, \(arrangement.desktopIcons.count - toMove.count) en place")
+                report.done.append(L("ctl.iconsMoved", moved, arrangement.desktopIcons.count - toMove.count))
             } catch {
-                report.problems.append("Bureau : \(error.localizedDescription)")
+                report.problems.append(L("ctl.errDesktop", error.localizedDescription))
             }
         }
 
@@ -203,21 +203,21 @@ final class Controller {
             if !saved.isEmpty {
                 if WindowBridge.isTrusted {
                     let r = WindowBridge.restore(saved, displays: displays)
-                    var text = "\(r.moved) fenêtres d'apps"
-                    if r.notFound > 0 { text += " (\(r.notFound) absentes)" }
-                    if r.fullScreen > 0 { text += " (\(r.fullScreen) en plein écran, laissées)" }
+                    var text = L("ctl.appsRestored", r.moved)
+                    if r.notFound > 0 { text += L("ctl.appsMissing", r.notFound) }
+                    if r.fullScreen > 0 { text += L("ctl.appsFullScreen", r.fullScreen) }
                     report.done.append(text)
                     if r.failed > 0 {
-                        report.problems.append("\(r.failed) fenêtre(s) ont refusé d'être déplacées : " + r.failures.joined(separator: " ; "))
+                        report.problems.append(L("ctl.refused", r.failed, r.failures.joined(separator: " ; ")))
                     }
                 } else {
-                    report.problems.append("Fenêtres d'applications : accès Accessibilité non accordé.")
+                    report.problems.append(L("ctl.errAppsTrust"))
                 }
             }
         }
 
-        let summary = report.done.isEmpty ? "rien à restaurer" : report.done.joined(separator: ", ")
-        setStatus("Restauré : \(summary)")
+        let summary = report.done.isEmpty ? L("ctl.nothingToRestore") : report.done.joined(separator: ", ")
+        setStatus(L("ctl.restored", summary))
         return report
     }
 
@@ -238,7 +238,7 @@ final class Controller {
         guard let arrangement = ArrangementSelector.forAutoRestore(store.data.arrangements,
                                                                     activeID: settings.activeArrangementID,
                                                                     displayKey: key) else {
-            setStatus("Auto (\(reason)) : aucun arrangement")
+            setStatus(L("ctl.autoNone", reason))
             return
         }
         let report = restore(arrangement)
