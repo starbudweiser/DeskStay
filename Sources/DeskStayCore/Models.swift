@@ -161,13 +161,15 @@ public struct Settings: Codable, Equatable, Sendable {
     public var restoreOnDisplayChange = false
     public var restoreOnWake = false
     public var restoreAtLaunch = false
+    /// Les icônes glissent vers leur place au lieu de sauter une à une.
+    public var animateIcons = true
     /// Applications dont les fenêtres ne sont jamais mémorisées ni déplacées (« Ne pas déplacer »).
     public var excludedApps: [String] = []
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case activeArrangementID, restoreOnDisplayChange, restoreOnWake, restoreAtLaunch, excludedApps
+        case activeArrangementID, restoreOnDisplayChange, restoreOnWake, restoreAtLaunch, animateIcons, excludedApps
     }
 
     /// Décodage tolérant : une clé absente (fichier d'une version antérieure) prend sa valeur par défaut.
@@ -177,6 +179,7 @@ public struct Settings: Codable, Equatable, Sendable {
         restoreOnDisplayChange = try c.decodeIfPresent(Bool.self, forKey: .restoreOnDisplayChange) ?? false
         restoreOnWake = try c.decodeIfPresent(Bool.self, forKey: .restoreOnWake) ?? false
         restoreAtLaunch = try c.decodeIfPresent(Bool.self, forKey: .restoreAtLaunch) ?? false
+        animateIcons = try c.decodeIfPresent(Bool.self, forKey: .animateIcons) ?? true
         excludedApps = try c.decodeIfPresent([String].self, forKey: .excludedApps) ?? []
     }
 }

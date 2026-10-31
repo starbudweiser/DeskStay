@@ -143,6 +143,7 @@ final class LogicTests: XCTestCase {
         XCTAssertFalse(s.restoreOnWake)
         XCTAssertFalse(s.restoreOnDisplayChange)
         XCTAssertFalse(s.restoreAtLaunch)
+        XCTAssertTrue(s.animateIcons)
         XCTAssertEqual(s.excludedApps, [])
         XCTAssertNil(s.activeArrangementID)
     }

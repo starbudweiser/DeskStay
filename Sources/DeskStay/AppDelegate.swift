@@ -126,6 +126,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         menu.addItem(ClosureMenuItem(c.hider.isHidden ? "Afficher les icônes du Bureau" : "Masquer les icônes du Bureau",
                                      key: "h") { [weak self] in self?.controller?.hider.toggle() })
+        menu.addItem(toggle("Faire glisser les icônes", c.settings.animateIcons) { $0.animateIcons.toggle() })
         menu.addItem(.separator())
 
         // Fenêtres (type Stay)

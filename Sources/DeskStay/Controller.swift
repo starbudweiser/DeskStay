@@ -177,7 +177,10 @@ final class Controller {
 
         if parts.contains(.icons), !arrangement.desktopIcons.isEmpty {
             do {
-                let moved = try finder().restoreDesktop(arrangement.desktopIcons, displays: displays)
+                let bridge = try finder()
+                let moved = settings.animateIcons
+                    ? try IconAnimator.restore(arrangement.desktopIcons, displays: displays, bridge: bridge)
+                    : try bridge.restoreDesktop(arrangement.desktopIcons, displays: displays)
                 report.done.append("\(moved)/\(arrangement.desktopIcons.count) icônes")
             } catch {
                 report.problems.append("Bureau : \(error.localizedDescription)")

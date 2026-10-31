@@ -36,6 +36,7 @@ enum SelfTest {
                 exit(1)
             }
             let (parts, app) = parse(arguments.count > 4 ? arguments[4] : "all")
+            if arguments.count > 5, arguments[5] == "slow" { IconAnimator.duration = 6 } // pour photographier l'animation
             printReport(controller.restore(active, parts: parts, onlyApp: app))
             print(controller.lastStatus)
         case "hide":

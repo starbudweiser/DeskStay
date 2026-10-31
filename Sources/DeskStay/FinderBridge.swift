@@ -92,6 +92,13 @@ final class FinderBridge {
         return Int(result.int32Value)
     }
 
+    /// Taille des icônes et du texte du Bureau (pour dessiner les copies animées à l'identique).
+    func readDesktopStyle() throws -> (iconSize: Int, textSize: Int) {
+        let parts = try call("readdesktopstyle").listItems
+        guard parts.count == 2 else { throw BridgeError.unexpectedResult("style du bureau") }
+        return (Int(parts[0].int32Value), Int(parts[1].int32Value))
+    }
+
     // MARK: Fenêtres Finder
 
     func readFinderWindows() throws -> [FinderWindowState] {
@@ -165,6 +172,13 @@ final class FinderBridge {
         end tell
         return {theNames, thePositions}
     end readDesktop
+
+    on readDesktopStyle()
+        tell application "Finder"
+            set o to icon view options of window of desktop
+            return {icon size of o, text size of o}
+        end tell
+    end readDesktopStyle
 
     on restoreDesktop(theNames, xs, ys)
         set moved to 0
