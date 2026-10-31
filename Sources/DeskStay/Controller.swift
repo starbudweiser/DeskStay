@@ -23,11 +23,6 @@ final class Controller {
 
     var settings: Settings { store.data.settings }
 
-    /// Prépare le pont AppleScript (compilation) et la taille des icônes pour que la première restauration soit immédiate.
-    func warmUp() {
-        guard let bridge = try? finder() else { return }
-        IconAnimator.warm(bridge)
-    }
 
     var activeArrangement: Arrangement? { store.arrangement(id: settings.activeArrangementID) }
 
@@ -184,10 +179,17 @@ final class Controller {
         if parts.contains(.icons), !arrangement.desktopIcons.isEmpty {
             do {
                 let bridge = try finder()
-                let moved = settings.animateIcons
-                    ? try IconAnimator.restore(arrangement.desktopIcons, displays: displays, bridge: bridge)
-                    : try bridge.restoreDesktop(arrangement.desktopIcons, displays: displays)
-                report.done.append("\(moved)/\(arrangement.desktopIcons.count) icônes")
+                // Le Finder met ~17 ms par icône : seules celles qui ne sont pas déjà en place sont déplacées.
+                let current = Dictionary(try bridge.readDesktop(displays: displays).map { ($0.name, $0) }, uniquingKeysWith: { a, _ in a })
+                let toMove = arrangement.desktopIcons.filter { icon in
+                    guard let now = current[icon.name], now.displayID == icon.displayID,
+                          let display = Geometry.targetDisplay(id: icon.displayID, in: displays) else { return true }
+                    let a = Geometry.denormalize(now.position, in: display.frame)
+                    let b = Geometry.denormalize(icon.position, in: display.frame)
+                    return hypot(a.x - b.x, a.y - b.y) >= 3 // le Finder arrondit à l'entier
+                }
+                let moved = toMove.isEmpty ? 0 : try bridge.restoreDesktop(toMove, displays: displays)
+                report.done.append("\(moved) icônes replacées, \(arrangement.desktopIcons.count - toMove.count) déjà en place")
             } catch {
                 report.problems.append("Bureau : \(error.localizedDescription)")
             }

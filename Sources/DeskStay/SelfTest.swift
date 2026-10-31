@@ -36,11 +36,6 @@ enum SelfTest {
                 exit(1)
             }
             let (parts, app) = parse(arguments.count > 4 ? arguments[4] : "all")
-            if arguments.count > 5, arguments[5] == "slow" { IconAnimator.duration = 6 } // pour photographier l'animation
-            if arguments.count > 5, arguments[5].hasPrefix("freeze") { IconAnimator.duration = 600 }
-            if arguments.count > 5, arguments[5].hasSuffix(":regular") { IconAnimator.labelWeight = .regular }
-            if arguments.count > 5, arguments[5].hasSuffix(":semibold") { IconAnimator.labelWeight = .semibold }
-            if let bridge = try? FinderBridge() { IconAnimator.warm(bridge); RunLoop.main.run(until: Date().addingTimeInterval(1.5)) } // vignettes prêtes, comme dans l'app après son lancement // copies quasi immobiles, pour les comparer aux vraies
             printReport(controller.restore(active, parts: parts, onlyApp: app))
             print(controller.lastStatus)
         case "hide":

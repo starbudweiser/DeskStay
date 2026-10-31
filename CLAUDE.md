@@ -32,8 +32,6 @@ Références :
 - Compiler : `swift build`
 - Tests : `swift test` (21 tests XCTest, tous verts au 31/10/2026)
 - App : `./build.sh` → `~/Applications/Utilitaires+/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
-- Les copies animées reprennent l'apparence du Finder : aperçus (QuickLookThumbnailing) mis en cache à l'avance (`IconCache`), alias dessinés avec l'icône de leur cible lue dans le signet (cible parfois dans iCloud Drive, inaccessible), noms coupés comme le Finder (mots puis caractères, 2 lignes, milieu tronqué en « ... », largeur 112 pt déduite de vrais noms). `--selftest restore icons freeze` fige l'animation pour comparer à l'original.
-- Retour des icônes : `IconAnimator` (copies des icônes animées par Core Animation sur des fenêtres posées au-dessus du Bureau, pendant que le Finder déplace les vraies, ~17 ms par icône) ; réglage `animateIcons`, `--selftest restore icons slow` pour la photographier au ralenti.
 - Icône : `assets/make_icon.py` (PyQt6, couleurs Socle) produit `assets/icon.icns` ; `build.sh` la copie dans l'app.
 - Essais réels : `SELFTEST=1 ./build.sh` (reste dans build/), puis `build/DeskStay.app/Contents/MacOS/DeskStay --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
 
@@ -48,3 +46,5 @@ Références :
 - Réponses en français, structurées (Objectif, Analyse, Fichiers, Code, Validation, Limites, Suite).
 - Changements minimaux et réversibles ; tests de non-régression pour la logique ; rapporter les commandes réellement exécutées et leurs résultats.
 - Ne rien présenter comme fonctionnel sans l'avoir vérifié.
+
+- Retour des icônes : instantané, comme DIM (essayé puis abandonné le 31/10/2026 : copies animées par Core Animation, trop fragiles à rendre identiques au Finder). Seules les icônes pas déjà en place sont déplacées (le Finder met ~17 ms par icône).
