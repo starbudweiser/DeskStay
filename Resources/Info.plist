@@ -6,6 +6,8 @@
     <string>fr</string>
     <key>CFBundleExecutable</key>
     <string>DeskStay</string>
+    <key>CFBundleIconFile</key>
+    <string>icon</string>
     <key>CFBundleIdentifier</key>
     <string>com.stephan.deskstay</string>
     <key>CFBundleInfoDictionaryVersion</key>
