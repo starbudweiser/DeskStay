@@ -194,8 +194,11 @@ final class Controller {
                     let r = WindowBridge.restore(saved, displays: displays)
                     var text = "\(r.moved) fenêtres d'apps"
                     if r.notFound > 0 { text += " (\(r.notFound) absentes)" }
+                    if r.fullScreen > 0 { text += " (\(r.fullScreen) en plein écran, laissées)" }
                     report.done.append(text)
-                    if r.failed > 0 { report.problems.append("\(r.failed) fenêtre(s) ont refusé d'être déplacées.") }
+                    if r.failed > 0 {
+                        report.problems.append("\(r.failed) fenêtre(s) ont refusé d'être déplacées : " + r.failures.joined(separator: " ; "))
+                    }
                 } else {
                     report.problems.append("Fenêtres d'applications : accès Accessibilité non accordé.")
                 }

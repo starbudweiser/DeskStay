@@ -18,6 +18,7 @@ enum WindowBridge {
         let title: String
         let index: Int
         let frame: CGRect
+        let isFullScreen: Bool
     }
 
     /// Apps ordinaires en cours d'exécution (le Finder est traité à part, par AppleScript).
@@ -41,8 +42,9 @@ enum WindowBridge {
             if let minimized: Bool = attribute(window, kAXMinimizedAttribute), minimized { continue }
             guard let origin = point(window), let size = size(window), size.width > 0, size.height > 0 else { continue }
             let title: String = attribute(window, kAXTitleAttribute) ?? ""
+            let fullScreen: Bool = attribute(window, "AXFullScreen") ?? false
             result.append(LiveWindow(element: window, title: title, index: result.count,
-                                     frame: CGRect(origin: origin, size: size)))
+                                     frame: CGRect(origin: origin, size: size), isFullScreen: fullScreen))
         }
         return result
     }
@@ -51,7 +53,7 @@ enum WindowBridge {
         var states: [AppWindowState] = []
         for app in apps {
             guard let bundleID = app.bundleIdentifier else { continue }
-            for w in windows(of: app) {
+            for w in windows(of: app) where !w.isFullScreen { // leur cadre est celui de l'écran, pas une position à rétablir
                 let center = CGPoint(x: w.frame.midX, y: w.frame.midY)
                 guard let d = Geometry.display(containing: center, in: displays) else { continue }
                 let relative = CGRect(x: w.frame.minX - d.frame.minX, y: w.frame.minY - d.frame.minY,
@@ -69,6 +71,10 @@ enum WindowBridge {
         var moved = 0
         var notFound = 0
         var failed = 0
+        /// Fenêtres en plein écran : macOS interdit de les déplacer, elles sont laissées telles quelles.
+        var fullScreen = 0
+        /// « App : titre » des fenêtres qui ont refusé d'être déplacées.
+        var failures: [String] = []
     }
 
     /// Les apps fermées ne sont pas lancées : leurs fenêtres comptent comme « non trouvées ».
@@ -84,11 +90,20 @@ enum WindowBridge {
             let pairs = WindowMatcher.match(saved: states, current: live.map { .init(title: $0.title, index: $0.index) })
             for pair in pairs {
                 let state = states[pair.saved]
+                if live[pair.current].isFullScreen {
+                    result.fullScreen += 1
+                    continue
+                }
                 guard let display = Geometry.targetDisplay(id: state.displayID, in: displays) else { continue }
                 let target = Geometry.mapRelativeFrame(state.relativeFrame.cgRect,
                                                        savedDisplaySize: CGSize(width: state.displayWidth, height: state.displayHeight),
                                                        to: display.frame)
-                if setFrame(live[pair.current].element, target) { result.moved += 1 } else { result.failed += 1 }
+                if setFrame(live[pair.current].element, target) {
+                    result.moved += 1
+                } else {
+                    result.failed += 1
+                    result.failures.append("\(state.appName) : \(live[pair.current].title.isEmpty ? "sans titre" : live[pair.current].title)")
+                }
             }
             result.notFound += states.count - pairs.count
         }
@@ -123,7 +138,7 @@ enum WindowBridge {
     }
 
     /// Taille, puis position, puis taille à nouveau : certaines apps refusent une taille qui sortirait de l'écran
-    /// tant que la fenêtre n'a pas été déplacée.
+    /// tant que la fenêtre n'a pas été déplacée. Une fenêtre de taille fixe compte comme réussie si elle a changé de place.
     private static func setFrame(_ element: AXUIElement, _ frame: CGRect) -> Bool {
         var origin = frame.origin
         var size = frame.size
@@ -131,6 +146,7 @@ enum WindowBridge {
         let first = AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, sv)
         let moved = AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, pv)
         let second = AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, sv)
-        return moved == .success && (first == .success || second == .success)
+        _ = (first, second)
+        return moved == .success
     }
 }
