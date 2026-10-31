@@ -109,13 +109,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let key = DisplayKey.make(displays)
         let known = c.store.data.arrangements.contains { $0.displayKey == key }
 
-        menu.addItem(info("\(displays.count) écran(s) — configuration \(known ? "mémorisée" : "non mémorisée")"))
+        menu.addItem(info("\(displays.count) écran(s), \(known ? "mémorisés" : "non mémorisés")"))
         menu.addItem(info(c.lastStatus))
         if c.store.isReadOnly { menu.addItem(info("⚠︎ Lecture seule : données non chargées")) }
         menu.addItem(.separator())
 
         let activeID = c.activeArrangement?.id
-        menu.addItem(info(c.activeArrangement.map { "Arrangement : « \($0.name) »" } ?? "Aucun arrangement actif"))
+        menu.addItem(info(c.activeArrangement.map { "« \($0.name) »" } ?? "Aucun arrangement actif"))
         menu.addItem(.separator())
 
         // Icônes du Bureau (type DIM)
@@ -163,9 +163,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(ClosureMenuItem("Quitter DeskStay", key: "q") { NSApp.terminate(nil) })
     }
 
+    /// Largeur maximale d'une ligne d'information : c'est elle qui fixait la largeur de tout le menu.
+    private static let infoLimit = 36
+
+    /// Ligne d'information : raccourcie au milieu si besoin, le texte complet reste dans l'infobulle.
     private func info(_ text: String) -> NSMenuItem {
-        let item = NSMenuItem(title: text, action: nil, keyEquivalent: "")
+        var shown = text
+        if text.count > Self.infoLimit {
+            let keep = Self.infoLimit - 1
+            shown = String(text.prefix(keep * 2 / 3)) + "…" + String(text.suffix(keep - keep * 2 / 3))
+        }
+        let item = NSMenuItem(title: shown, action: nil, keyEquivalent: "")
         item.isEnabled = false
+        if shown != text { item.toolTip = text }
         return item
     }
 

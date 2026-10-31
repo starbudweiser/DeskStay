@@ -134,7 +134,7 @@ final class Controller {
         if let error = persist() {
             report.problems.append("Enregistrement : \(error.localizedDescription)")
         }
-        setStatus("Mémorisé « \(arrangement.name) » : " + report.done.joined(separator: ", "))
+        setStatus("Mémorisé : " + report.done.joined(separator: ", "))
         return report
     }
 
@@ -189,7 +189,7 @@ final class Controller {
                     return hypot(a.x - b.x, a.y - b.y) >= 3 // le Finder arrondit à l'entier
                 }
                 let moved = toMove.isEmpty ? 0 : try bridge.restoreDesktop(toMove, displays: displays)
-                report.done.append("\(moved) icônes replacées, \(arrangement.desktopIcons.count - toMove.count) déjà en place")
+                report.done.append("\(moved) icônes replacées, \(arrangement.desktopIcons.count - toMove.count) en place")
             } catch {
                 report.problems.append("Bureau : \(error.localizedDescription)")
             }
@@ -217,7 +217,7 @@ final class Controller {
         }
 
         let summary = report.done.isEmpty ? "rien à restaurer" : report.done.joined(separator: ", ")
-        setStatus("Restauré « \(arrangement.name) » : \(summary)")
+        setStatus("Restauré : \(summary)")
         return report
     }
 
