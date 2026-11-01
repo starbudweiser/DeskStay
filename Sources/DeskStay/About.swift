@@ -13,8 +13,7 @@ enum About {
     static func show() {
         if window == nil { window = makeWindow() }
         window?.center()
-        NSApp.activate()
-        window?.makeKeyAndOrderFront(nil)
+        window?.present()
     }
 
     private static func label(_ text: String, size: CGFloat = 12, bold: Bool = false, secondary: Bool = false) -> NSTextField {
