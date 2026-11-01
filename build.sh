@@ -2,7 +2,7 @@
 # Compile DeskStay et produit build/DeskStay.app.
 # Signature : certificat local stable (sign_app.sh), macOS garde ainsi les autorisations d'un build à l'autre.
 # Autre identité : SIGN_IDENTITY="<empreinte SHA-1 ou nom du certificat>" ./build.sh
-# Un build normal est déplacé dans ~/Applications/Utilitaires+ (INSTALL_DIR pour un autre dossier).
+# Un build normal est déplacé dans ~/Applications/Home Applications (INSTALL_DIR pour un autre dossier).
 # Essais réels : SELFTEST=1 ./build.sh ajoute le pilotage sans menu (voir SelfTest.swift).
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -32,7 +32,7 @@ fi
 
 # Build normal : l'app est déplacée (plus de copie dans build/). Le build d'essai reste dans build/.
 if [ "${SELFTEST:-0}" != "1" ]; then
-    DEST="${INSTALL_DIR:-$HOME/Applications/Utilitaires+}"
+    DEST="${INSTALL_DIR:-$HOME/Applications/Home Applications}"
     mkdir -p "$DEST"
     pgrep -x DeskStay >/dev/null && echo "ATTENTION : DeskStay tourne, relancez-le pour utiliser la nouvelle version." >&2
     rm -rf "$DEST/DeskStay.app"
