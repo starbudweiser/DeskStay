@@ -31,7 +31,7 @@ Références :
 ## Commandes
 - Compiler : `swift build`
 - Tests : `swift test` (21 tests XCTest, tous verts au 31/10/2026)
-- App : `./build.sh` → `~/Applications/Utilitaires+/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
+- App : `./build.sh` → `~/Applications/Home Applications/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
 - Langues : fr, en, es, it, mêmes clés partout, anglais si la langue du système est autre. Textes dans `tools/strings_table.py` ; `python3 tools/gen_strings.py` génère `Resources/<langue>.lproj/{Localizable,InfoPlist}.strings` (copiés par `build.sh`). Dans le code : `L("clé", args)` (`%@`, `%ld`), jamais de texte en dur ; `LocalizationTests` vérifie clés, formats et usage. Essai : `DeskStay --selftest <dir> events -AppleLanguages "(es)"`.
 - À propos : `About.swift`, licence MIT dans `LICENSE`, auteurs « Starbudweiser & Claude Code ».
 - Icône : `assets/make_icon.py` (PyQt6, couleurs Socle) produit `assets/icon.icns` ; `build.sh` la copie dans l'app.
