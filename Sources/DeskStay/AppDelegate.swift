@@ -12,6 +12,9 @@ final class ClosureMenuItem: NSMenuItem {
         self.handler = handler
         self.target = self
         self.keyEquivalentModifierMask = key.isEmpty ? [] : modifiers
+        if title.contains(Brand.name) { // lettre minuscule du nom en couleur
+            self.attributedTitle = BrandStyle.colored(title, font: NSFont.menuFont(ofSize: 0))
+        }
     }
 
     @MainActor @objc private func fire() { // AppKit appelle les actions de menu sur le thread principal
@@ -47,7 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         self.controller = controller
 
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        if let image = NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "DeskStay") {
+        if let image = NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "DeSKSTAY") {
             image.isTemplate = true
             item.button?.image = image
         } else {
@@ -366,6 +369,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         field.placeholderString = L("dialog.namePlaceholder")
         alert.accessoryView = field
         alert.window.initialFirstResponder = field
+        BrandStyle.apply(to: alert.window)
         guard alert.runModal() == .alertFirstButtonReturn else { return nil }
         guard let name = ArrangementName.sanitize(field.stringValue) else {
             showAlert(L("dialog.invalidName"), L("dialog.invalidNameInfo"))
@@ -383,6 +387,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = text
+        BrandStyle.apply(to: alert.window)
         alert.runModal()
     }
 }

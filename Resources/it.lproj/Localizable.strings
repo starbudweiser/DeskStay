@@ -1,4 +1,4 @@
-/* DeskStay — it. Fichier généré par tools/gen_strings.py : modifier tools/strings_table.py. */
+/* DeSKSTAY — it. Fichier généré par tools/gen_strings.py : modifier tools/strings_table.py. */
 "menu.displaysKnown" = "%ld schermo/i, memorizzati";
 "menu.displaysUnknown" = "%ld schermo/i, non memorizzati";
 "menu.readOnly" = "⚠︎ Sola lettura: dati non caricati";
@@ -22,7 +22,7 @@
 "menu.login" = "Apri all'avvio della sessione";
 "menu.allowAccessibility" = "Consenti l'accesso Accessibilità…";
 "menu.openData" = "Apri la cartella dei dati";
-"menu.quit" = "Esci da DeskStay";
+"menu.quit" = "Esci da DeSKSTAY";
 "arr.none" = "Nessuna";
 "arr.summary" = "%ld icone · %ld Finder · %ld finestre";
 "arr.thisDisplays" = " · questi schermi";
@@ -45,7 +45,7 @@
 "apps.nameExcluded" = "%@ — non spostare";
 "auto.displays" = "Quando cambiano gli schermi";
 "auto.wake" = "Alla riattivazione e allo sblocco";
-"auto.launch" = "All'apertura di DeskStay";
+"auto.launch" = "All'apertura di DeSKSTAY";
 "reason.launch" = "apertura";
 "reason.displays" = "schermi";
 "reason.wake" = "riattivazione";
@@ -101,14 +101,14 @@
 "bridge.desktop" = "scrivania";
 "bridge.desktopStyle" = "stile della scrivania";
 "bridge.compile" = "Script interno non valido: %@";
-"bridge.denied" = "DeskStay non è autorizzato a controllare il Finder (Impostazioni di Sistema › Privacy e sicurezza › Automazione).";
+"bridge.denied" = "DeSKSTAY non è autorizzato a controllare il Finder (Impostazioni di Sistema › Privacy e sicurezza › Automazione).";
 "bridge.noReply" = "Il Finder non risponde.";
 "bridge.timeout" = "Il Finder ha impiegato troppo tempo a rispondere.";
 "bridge.appleScript" = "Errore AppleScript %ld: %@";
 "bridge.unexpected" = "Risposta inattesa dal Finder: %@";
 "store.newer" = "Il file di dati è stato creato da una versione più recente (formato %ld). Non viene modificato.";
 "store.readOnly" = "Impossibile caricare i dati: il salvataggio è disattivato per non sovrascrivere il file esistente.";
-"about.menu" = "Informazioni su DeskStay";
+"about.menu" = "Informazioni su DeSKSTAY";
 "about.tagline" = "Memorizza e ripristina la posizione delle icone della Scrivania e delle finestre, per ogni combinazione di schermi.";
 "about.version" = "Versione %@ (%@)";
 "about.authors" = "Di Starbudweiser e Claude Code (Anthropic).";

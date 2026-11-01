@@ -1,4 +1,4 @@
-"""Dessine l'icône de DeskStay (1024 px, couleurs Socle) puis produit icon.icns avec iconutil.
+"""Dessine l'icône de DeSKSTAY (1024 px, couleurs Socle) puis produit icon.icns avec iconutil.
 Une fenêtre qui reste en place, avec les icônes du Bureau en grille : DIM + Stay."""
 import json, os, subprocess, sys, tempfile
 from PyQt6.QtCore import QPointF, QRectF, Qt

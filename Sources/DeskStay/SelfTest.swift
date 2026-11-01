@@ -3,7 +3,7 @@ import AppKit
 import DeskStayCore
 
 /// Pilotage sans menu pour les essais réels (build `SELFTEST=1 ./build.sh` uniquement, absent des builds normaux).
-/// `DeskStay --selftest <dossier de données> <commande>`, le dossier isole les essais des vraies données.
+/// `DeSKSTAY --selftest <dossier de données> <commande>`, le dossier isole les essais des vraies données.
 @MainActor
 enum SelfTest {
     static func runIfRequested(_ arguments: [String]) -> Bool {

@@ -1,4 +1,4 @@
-# DeskStay — contexte projet
+# DeSKSTAY — contexte projet
 
 App macOS personnelle de barre de menus qui combine **Desktop Icon Manager** (positions des icônes du Bureau et des fenêtres Finder, arrangements multiples, positions relatives à l'écran) et **Stay** (positions des fenêtres d'applications par combinaison d'écrans, restauration automatique).
 
@@ -31,11 +31,11 @@ Références :
 ## Commandes
 - Compiler : `swift build`
 - Tests : `swift test` (21 tests XCTest, tous verts au 31/10/2026)
-- App : `./build.sh` → `~/Applications/Home Applications/DeskStay.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
-- Langues : fr, en, es, it, mêmes clés partout, anglais si la langue du système est autre. Textes dans `tools/strings_table.py` ; `python3 tools/gen_strings.py` génère `Resources/<langue>.lproj/{Localizable,InfoPlist}.strings` (copiés par `build.sh`). Dans le code : `L("clé", args)` (`%@`, `%ld`), jamais de texte en dur ; `LocalizationTests` vérifie clés, formats et usage. Essai : `DeskStay --selftest <dir> events -AppleLanguages "(es)"`.
+- App : `./build.sh` → `~/Applications/Home Applications/DeSKSTAY.app` (déplacée, pas de copie dans build/) (signé via `sign_app.sh`, certificat local stable ; `SIGN_IDENTITY=<SHA-1> ./build.sh` pour un autre certificat)
+- Langues : fr, en, es, it, mêmes clés partout, anglais si la langue du système est autre. Textes dans `tools/strings_table.py` ; `python3 tools/gen_strings.py` génère `Resources/<langue>.lproj/{Localizable,InfoPlist}.strings` (copiés par `build.sh`). Dans le code : `L("clé", args)` (`%@`, `%ld`), jamais de texte en dur ; `LocalizationTests` vérifie clés, formats et usage. Essai : `DeSKSTAY --selftest <dir> events -AppleLanguages "(es)"`.
 - À propos : `About.swift`, licence MIT dans `LICENSE`, auteurs « Starbudweiser & Claude Code ».
 - Icône : `assets/make_icon.py` (PyQt6, couleurs Socle) produit `assets/icon.icns` ; `build.sh` la copie dans l'app.
-- Essais réels : `SELFTEST=1 ./build.sh` (reste dans build/), puis `build/DeskStay.app/Contents/MacOS/DeskStay --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
+- Essais réels : `SELFTEST=1 ./build.sh` (reste dans build/), puis `build/DeSKSTAY.app/Contents/MacOS/DeSKSTAY --selftest <dossier de données> status|memorize|restore|hide|auto|events` (code absent des builds normaux)
 
 ## Points ouverts
 - **Signature / notarisation bloquées** : le mot de passe du trousseau « session » ne correspond pas au mot de passe de session (vérifié avec `dscl . -authonly`), donc `codesign` ne peut pas utiliser la clé Developer ID `B675FD78…` (trousseau session). Une 2e identité Developer ID (`CB7AAA54…`) est dans `skyrim-signing.keychain-db`. Ne jamais réinitialiser le trousseau sans accord explicite.
@@ -50,3 +50,6 @@ Références :
 - Ne rien présenter comme fonctionnel sans l'avoir vérifié.
 
 - Retour des icônes : instantané, comme DIM (essayé puis abandonné le 31/10/2026 : copies animées par Core Animation, trop fragiles à rendre identiques au Finder). Seules les icônes pas déjà en place sont déplacées (le Finder met ~17 ms par icône).
+## Nom de l'appli (règle Socle « Nom de l'appli », 01/11/2026)
+- Nom affiché : **DeSKSTAY** (majuscules, « e » minuscule). Le « e » est coloré (ambre du logo, `BrandStyle.color`) partout dans l'interface : fenêtre À propos, entrées de menu (`ClosureMenuItem`), dialogues (`BrandStyle.apply(to:)`). Texte brut dans la barre de titre, la barre des menus et les notifications système (limite du système). `Brand.name` / `Brand.lowercaseRanges` (DeskStayCore) portent la règle, testée dans `BrandTests`.
+- Paquet `DeSKSTAY.app`, binaire `DeSKSTAY` (produit SwiftPM `.executable`). Restent en `DeskStay` (identifiants, pas le nom affiché) : cibles/dossiers SwiftPM, dépôt GitHub, identifiant de paquet `com.stephan.deskstay` (garde les autorisations macOS), dossier de données `~/Library/Application Support/DeskStay`.

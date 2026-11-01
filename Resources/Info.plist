@@ -12,7 +12,7 @@
         <string>it</string>
     </array>
     <key>CFBundleExecutable</key>
-    <string>DeskStay</string>
+    <string>DeSKSTAY</string>
     <key>CFBundleIconFile</key>
     <string>icon</string>
     <key>CFBundleIdentifier</key>
@@ -20,9 +20,9 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>DeskStay</string>
+    <string>DeSKSTAY</string>
     <key>CFBundleDisplayName</key>
-    <string>DeskStay</string>
+    <string>DeSKSTAY</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -36,7 +36,7 @@
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Starbudweiser</string>
     <key>NSAppleEventsUsageDescription</key>
-    <string>DeskStay controls the Finder to save and restore the position of icons and windows.</string>
+    <string>DeSKSTAY controls the Finder to save and restore the position of icons and windows.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

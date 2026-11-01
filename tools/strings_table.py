@@ -1,4 +1,4 @@
-# Table des textes de DeskStay : clé, français (rédigé en premier), anglais, espagnol, italien.
+# Table des textes de DeSKSTAY : clé, français (rédigé en premier), anglais, espagnol, italien.
 # `python3 tools/gen_strings.py` en tire Resources/<langue>.lproj/Localizable.strings.
 T = [
 # --- menu
@@ -25,7 +25,7 @@ T = [
 ("menu.login", "Ouvrir à l'ouverture de session", "Open at login", "Abrir al iniciar sesión", "Apri all'avvio della sessione"),
 ("menu.allowAccessibility", "Autoriser l'accès Accessibilité…", "Allow Accessibility access…", "Permitir el acceso de Accesibilidad…", "Consenti l'accesso Accessibilità…"),
 ("menu.openData", "Ouvrir le dossier des données", "Open the data folder", "Abrir la carpeta de datos", "Apri la cartella dei dati"),
-("menu.quit", "Quitter DeskStay", "Quit DeskStay", "Salir de DeskStay", "Esci da DeskStay"),
+("menu.quit", "Quitter DeSKSTAY", "Quit DeSKSTAY", "Salir de DeSKSTAY", "Esci da DeSKSTAY"),
 # --- arrangements
 ("arr.none", "Aucun", "None", "Ninguno", "Nessuna"),
 ("arr.summary", "%ld icônes · %ld Finder · %ld fenêtres", "%ld icons · %ld Finder · %ld windows", "%ld iconos · %ld Finder · %ld ventanas", "%ld icone · %ld Finder · %ld finestre"),
@@ -51,7 +51,7 @@ T = [
 # --- restauration automatique
 ("auto.displays", "Quand les écrans changent", "When displays change", "Cuando cambian las pantallas", "Quando cambiano gli schermi"),
 ("auto.wake", "Au réveil et au déverrouillage", "On wake and unlock", "Al reactivar y desbloquear", "Alla riattivazione e allo sblocco"),
-("auto.launch", "À l'ouverture de DeskStay", "When DeskStay opens", "Al abrir DeskStay", "All'apertura di DeskStay"),
+("auto.launch", "À l'ouverture de DeSKSTAY", "When DeSKSTAY opens", "Al abrir DeSKSTAY", "All'apertura di DeSKSTAY"),
 ("reason.launch", "ouverture", "launch", "apertura", "apertura"),
 ("reason.displays", "écrans", "displays", "pantallas", "schermi"),
 ("reason.wake", "réveil", "wake", "reactivación", "riattivazione"),
@@ -110,7 +110,7 @@ T = [
 ("bridge.desktop", "bureau", "desktop", "escritorio", "scrivania"),
 ("bridge.desktopStyle", "style du bureau", "desktop style", "estilo del escritorio", "stile della scrivania"),
 ("bridge.compile", "Script interne invalide : %@", "Invalid internal script: %@", "Script interno no válido: %@", "Script interno non valido: %@"),
-("bridge.denied", "DeskStay n'est pas autorisé à piloter le Finder (Réglages Système › Confidentialité et sécurité › Automatisation).", "DeskStay is not allowed to control the Finder (System Settings › Privacy & Security › Automation).", "DeskStay no tiene permiso para controlar el Finder (Ajustes del Sistema › Privacidad y seguridad › Automatización).", "DeskStay non è autorizzato a controllare il Finder (Impostazioni di Sistema › Privacy e sicurezza › Automazione)."),
+("bridge.denied", "DeSKSTAY n'est pas autorisé à piloter le Finder (Réglages Système › Confidentialité et sécurité › Automatisation).", "DeSKSTAY is not allowed to control the Finder (System Settings › Privacy & Security › Automation).", "DeSKSTAY no tiene permiso para controlar el Finder (Ajustes del Sistema › Privacidad y seguridad › Automatización).", "DeSKSTAY non è autorizzato a controllare il Finder (Impostazioni di Sistema › Privacy e sicurezza › Automazione)."),
 ("bridge.noReply", "Le Finder ne répond pas.", "The Finder is not responding.", "El Finder no responde.", "Il Finder non risponde."),
 ("bridge.timeout", "Le Finder a mis trop de temps à répondre.", "The Finder took too long to respond.", "El Finder ha tardado demasiado en responder.", "Il Finder ha impiegato troppo tempo a rispondere."),
 ("bridge.appleScript", "Erreur AppleScript %ld : %@", "AppleScript error %ld: %@", "Error de AppleScript %ld: %@", "Errore AppleScript %ld: %@"),
@@ -119,7 +119,7 @@ T = [
 ("store.newer", "Le fichier de données a été créé par une version plus récente (format %ld). Il n'est pas modifié.", "The data file was created by a newer version (format %ld). It is left untouched.", "El archivo de datos fue creado por una versión más reciente (formato %ld). No se modifica.", "Il file di dati è stato creato da una versione più recente (formato %ld). Non viene modificato."),
 ("store.readOnly", "Les données n'ont pas pu être chargées : l'enregistrement est désactivé pour ne pas écraser le fichier existant.", "The data could not be loaded: saving is disabled so the existing file is not overwritten.", "No se pudieron cargar los datos: el guardado está desactivado para no sobrescribir el archivo existente.", "Impossibile caricare i dati: il salvataggio è disattivato per non sovrascrivere il file esistente."),
 # --- à propos
-("about.menu", "À propos de DeskStay", "About DeskStay", "Acerca de DeskStay", "Informazioni su DeskStay"),
+("about.menu", "À propos de DeSKSTAY", "About DeSKSTAY", "Acerca de DeSKSTAY", "Informazioni su DeSKSTAY"),
 ("about.tagline", "Mémorise et restaure la position des icônes du Bureau et des fenêtres, par combinaison d'écrans.", "Remembers and restores the position of desktop icons and windows, for each combination of displays.", "Memoriza y restaura la posición de los iconos del Escritorio y de las ventanas, según la combinación de pantallas.", "Memorizza e ripristina la posizione delle icone della Scrivania e delle finestre, per ogni combinazione di schermi."),
 ("about.version", "Version %@ (%@)", "Version %@ (%@)", "Versión %@ (%@)", "Versione %@ (%@)"),
 ("about.authors", "Par Starbudweiser & Claude Code (Anthropic).", "By Starbudweiser & Claude Code (Anthropic).", "Por Starbudweiser y Claude Code (Anthropic).", "Di Starbudweiser e Claude Code (Anthropic)."),
@@ -129,10 +129,10 @@ T = [
 ]
 INFOPLIST = [
 ("NSAppleEventsUsageDescription",
- "DeskStay pilote le Finder pour mémoriser et restaurer la position des icônes et des fenêtres.",
- "DeskStay controls the Finder to save and restore the position of icons and windows.",
- "DeskStay controla el Finder para memorizar y restaurar la posición de los iconos y las ventanas.",
- "DeskStay controlla il Finder per memorizzare e ripristinare la posizione delle icone e delle finestre."),
+ "DeSKSTAY pilote le Finder pour mémoriser et restaurer la position des icônes et des fenêtres.",
+ "DeSKSTAY controls the Finder to save and restore the position of icons and windows.",
+ "DeSKSTAY controla el Finder para memorizar y restaurar la posición de los iconos y las ventanas.",
+ "DeSKSTAY controlla il Finder per memorizzare e ripristinare la posizione delle icone e delle finestre."),
 ("NSHumanReadableCopyright", "© 2026 Starbudweiser", "© 2026 Starbudweiser", "© 2026 Starbudweiser", "© 2026 Starbudweiser"),
 ]
 LANGS = ["fr", "en", "es", "it"]

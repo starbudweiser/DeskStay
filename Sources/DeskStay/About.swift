@@ -19,8 +19,13 @@ enum About {
 
     private static func label(_ text: String, size: CGFloat = 12, bold: Bool = false, secondary: Bool = false) -> NSTextField {
         let field = NSTextField(wrappingLabelWithString: text)
-        field.font = bold ? NSFont.boldSystemFont(ofSize: size) : NSFont.systemFont(ofSize: size)
-        field.textColor = secondary ? .secondaryLabelColor : .labelColor
+        let font = bold ? NSFont.boldSystemFont(ofSize: size) : NSFont.systemFont(ofSize: size)
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        // Lettre minuscule du nom en couleur (règle Socle « Nom de l'appli »)
+        field.attributedStringValue = BrandStyle.colored(NSAttributedString(string: text, attributes: [
+            .font: font, .paragraphStyle: paragraph,
+            .foregroundColor: secondary ? NSColor.secondaryLabelColor : NSColor.labelColor]))
         field.alignment = .center
         field.preferredMaxLayoutWidth = textWidth
         field.isSelectable = false
@@ -42,7 +47,7 @@ enum About {
 
         let views: [NSView] = [
             icon,
-            label("DeskStay", size: 17, bold: true),
+            label(Brand.name, size: 17, bold: true),
             label(L("about.version", version, build), secondary: true),
             label(L("about.tagline")),
             label(L("about.authors"), bold: true),

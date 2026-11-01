@@ -1,4 +1,4 @@
-/* DeskStay — en. Fichier généré par tools/gen_strings.py : modifier tools/strings_table.py. */
+/* DeSKSTAY — en. Fichier généré par tools/gen_strings.py : modifier tools/strings_table.py. */
 "menu.displaysKnown" = "%ld display(s), saved";
 "menu.displaysUnknown" = "%ld display(s), not saved";
 "menu.readOnly" = "⚠︎ Read-only: data not loaded";
@@ -22,7 +22,7 @@
 "menu.login" = "Open at login";
 "menu.allowAccessibility" = "Allow Accessibility access…";
 "menu.openData" = "Open the data folder";
-"menu.quit" = "Quit DeskStay";
+"menu.quit" = "Quit DeSKSTAY";
 "arr.none" = "None";
 "arr.summary" = "%ld icons · %ld Finder · %ld windows";
 "arr.thisDisplays" = " · these displays";
@@ -45,7 +45,7 @@
 "apps.nameExcluded" = "%@ — do not move";
 "auto.displays" = "When displays change";
 "auto.wake" = "On wake and unlock";
-"auto.launch" = "When DeskStay opens";
+"auto.launch" = "When DeSKSTAY opens";
 "reason.launch" = "launch";
 "reason.displays" = "displays";
 "reason.wake" = "wake";
@@ -101,14 +101,14 @@
 "bridge.desktop" = "desktop";
 "bridge.desktopStyle" = "desktop style";
 "bridge.compile" = "Invalid internal script: %@";
-"bridge.denied" = "DeskStay is not allowed to control the Finder (System Settings › Privacy & Security › Automation).";
+"bridge.denied" = "DeSKSTAY is not allowed to control the Finder (System Settings › Privacy & Security › Automation).";
 "bridge.noReply" = "The Finder is not responding.";
 "bridge.timeout" = "The Finder took too long to respond.";
 "bridge.appleScript" = "AppleScript error %ld: %@";
 "bridge.unexpected" = "Unexpected reply from the Finder: %@";
 "store.newer" = "The data file was created by a newer version (format %ld). It is left untouched.";
 "store.readOnly" = "The data could not be loaded: saving is disabled so the existing file is not overwritten.";
-"about.menu" = "About DeskStay";
+"about.menu" = "About DeSKSTAY";
 "about.tagline" = "Remembers and restores the position of desktop icons and windows, for each combination of displays.";
 "about.version" = "Version %@ (%@)";
 "about.authors" = "By Starbudweiser & Claude Code (Anthropic).";
