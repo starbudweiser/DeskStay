@@ -13,9 +13,6 @@ final class ClosureMenuItem: NSMenuItem {
         self.target = self
         self.keyEquivalentModifierMask = key.isEmpty ? [] : modifiers
         if let symbol { self.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil) }
-        if title.contains(Brand.name) { // lettre minuscule du nom en couleur
-            self.attributedTitle = BrandStyle.colored(title, font: NSFont.menuFont(ofSize: 0))
-        }
     }
 
     @MainActor @objc private func fire() { // AppKit appelle les actions de menu sur le thread principal
