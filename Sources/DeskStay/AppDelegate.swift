@@ -6,12 +6,13 @@ import ServiceManagement
 final class ClosureMenuItem: NSMenuItem {
     private var handler: (@MainActor () -> Void)?
 
-    convenience init(_ title: String, key: String = "", modifiers: NSEvent.ModifierFlags = [.command],
+    convenience init(_ title: String, symbol: String? = nil, key: String = "", modifiers: NSEvent.ModifierFlags = [.command],
                      handler: @escaping @MainActor () -> Void) {
         self.init(title: title, action: #selector(fire), keyEquivalent: key)
         self.handler = handler
         self.target = self
         self.keyEquivalentModifierMask = key.isEmpty ? [] : modifiers
+        if let symbol { self.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil) }
         if title.contains(Brand.name) { // lettre minuscule du nom en couleur
             self.attributedTitle = BrandStyle.colored(title, font: NSFont.menuFont(ofSize: 0))
         }
@@ -122,21 +123,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         // Icônes du Bureau (type DIM)
         menu.addItem(.sectionHeader(title: L("menu.iconsHeader")))
-        menu.addItem(ClosureMenuItem(L("menu.memorizeIcons")) { [weak self] in self?.memorize(into: activeID, purge: false, parts: .icons) })
+        menu.addItem(ClosureMenuItem(L("menu.memorizeIcons"), symbol: "square.and.arrow.down") { [weak self] in self?.memorize(into: activeID, purge: false, parts: .icons) })
         if let activeID {
-            menu.addItem(ClosureMenuItem(L("menu.restoreIcons")) { [weak self] in self?.restore(activeID, parts: .icons) })
+            menu.addItem(ClosureMenuItem(L("menu.restoreIcons"), symbol: "arrow.counterclockwise") { [weak self] in self?.restore(activeID, parts: .icons) })
         }
         menu.addItem(ClosureMenuItem(L(c.hider.isHidden ? "menu.showIcons" : "menu.hideIcons"),
-                                     key: "h") { [weak self] in self?.controller?.hider.toggle() })
+                                     symbol: c.hider.isHidden ? "eye" : "eye.slash", key: "h") { [weak self] in self?.controller?.hider.toggle() })
         menu.addItem(.separator())
 
         // Fenêtres (type Stay)
         menu.addItem(.sectionHeader(title: L("menu.windowsHeader")))
-        menu.addItem(ClosureMenuItem(L("menu.memorizeWindows")) { [weak self] in self?.memorize(into: activeID, purge: false, parts: .windows) })
+        menu.addItem(ClosureMenuItem(L("menu.memorizeWindows"), symbol: "square.and.arrow.down") { [weak self] in self?.memorize(into: activeID, purge: false, parts: .windows) })
         if let activeID {
-            menu.addItem(ClosureMenuItem(L("menu.restoreWindows")) { [weak self] in self?.restore(activeID, parts: .windows) })
+            menu.addItem(ClosureMenuItem(L("menu.restoreWindows"), symbol: "arrow.counterclockwise") { [weak self] in self?.restore(activeID, parts: .windows) })
         }
-        menu.addItem(applicationsItem(active: c.activeArrangement))
+        let apps = applicationsItem(active: c.activeArrangement)
+        apps.image = NSImage(systemSymbolName: "macwindow.on.rectangle", accessibilityDescription: nil)
+        menu.addItem(apps)
         menu.addItem(.separator())
 
         // Tout
